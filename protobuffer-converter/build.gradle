@@ -41,14 +41,8 @@ protobuf {
         artifact = 'com.google.protobuf:protoc:3.5.1'
     }
     generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                remove java
-            }
-            task.builtins {
-                java { }
-                cpp { }
-            }
+        all()*.builtins {
+            javanano { }
         }
     }
 
@@ -56,10 +50,10 @@ protobuf {
 
 
 dependencies {
-    implementation 'com.google.protobuf:protobuf-java:3.5.1'
-//    api project(':jd-im')
-    implementation 'com.sire:jd-im:1.0.1'
+    api 'com.google.protobuf.nano:protobuf-javanano:3.2.0rc2'
 
+    implementation project(':jd-im')
+//    implementation 'com.sire:jd-im:1.0.1'
 }
 
 //apply from: '../publish.gradle'

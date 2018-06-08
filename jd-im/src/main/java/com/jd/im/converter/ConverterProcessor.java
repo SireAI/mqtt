@@ -14,7 +14,6 @@ public class ConverterProcessor {
 
     private Converter.Factory factory;
 
-
     public ConverterProcessor(Converter.Factory factory) {
         this.factory = factory;
     }
@@ -24,19 +23,20 @@ public class ConverterProcessor {
             Converter<T, byte[]> converter = (Converter<T, byte[]>) factory.objectRequestConverter();
             try {
                 return converter.convert(request);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         return null;
     }
 
-    public <T> T deserialize(byte[] response) {
+    public <T> T deserialize(byte[] response,int messageType) {
         if (factory != null) {
-            Converter<byte[], T> converter = (Converter<byte[], T>) factory.responseObjectConverter();
+
+            Converter<byte[], T> converter = (Converter<byte[], T>) factory.responseObjectConverter(factory.getClazzByType(messageType));
             try {
                 return converter.convert(response);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

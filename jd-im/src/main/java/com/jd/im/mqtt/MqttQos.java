@@ -1,5 +1,6 @@
 package com.jd.im.mqtt;
 
+import com.jd.im.mqtt.messages.MQTTDisconnect;
 import com.jd.im.utils.Log;
 
 import com.jd.im.IMQTTMessage;
@@ -123,8 +124,11 @@ public class MqttQos {
                     qosCallBack.onPinReceived();
                 }
                 break;
-            // 客户端不会接受此类消息
             case DISCONNECT:
+                MQTTDisconnect mqttDisconnect = MQTTDisconnect.fromBuffer(data);
+                dispatchPush(mqttDisconnect);
+                break;
+             // 客户端不会接受此类消息
             case CONNECT:
             case SUBSCRIBE:
             case UNSUBSCRIBE:
@@ -266,5 +270,6 @@ public class MqttQos {
          * @param id
          */
         void notifyTimeOutRelease(int id);
+
     }
 }

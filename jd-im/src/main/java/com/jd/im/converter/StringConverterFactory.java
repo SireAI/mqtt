@@ -12,9 +12,15 @@ public class StringConverterFactory implements Converter.Factory {
         return factory;
     }
 
+
+    @Override
+    public Class getClazzByType(int messageType) {
+        return null;
+    }
+
     @Nullable
     @Override
-    public Converter<byte[], String> responseObjectConverter() {
+    public Converter<byte[], ?> responseObjectConverter(Class clazz) {
         return new ResponseStringConverter();
     }
 

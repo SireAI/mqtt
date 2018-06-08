@@ -1,6 +1,13 @@
 package com.jd.im.converter;
 
-import com.jd.im.message.ClientPublishMessage;
+
+import com.google.protobuf.nano.MessageNano;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.jd.im.mqtt.MQTTConstants.DISCONNECT;
+import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
 
 /**
  * =====================================================
@@ -10,24 +17,50 @@ import com.jd.im.message.ClientPublishMessage;
  * Description: 数据序列化protobuffer
  * =====================================================
  */
-public class ProtobufferConverterFactory implements Converter.Factory{
+public class ProtobufferConverterFactory implements Converter.Factory {
 
-    private static Converter.Factory factory;
+    private static ProtobufferConverterFactory factory;
 
-    public static Converter.Factory create() {
+    private Map<Integer, Class> clazzType = new HashMap<>();
+
+    public static ProtobufferConverterFactory create() {
         if (factory == null) {
             factory = new ProtobufferConverterFactory();
         }
         return factory;
     }
 
+    /**
+     * 消息类型与解析类型绑定
+     *
+     * @param messageType
+     * @param clazz
+     */
+    public ProtobufferConverterFactory bind(int messageType, Class clazz) {
+        clazzType.put(messageType, clazz);
+        return this;
+    }
+    public ProtobufferConverterFactory bindPublish(Class clazz) {
+        clazzType.put((int) PUBLISH, clazz);
+        return this;
+    }
+
+    public ProtobufferConverterFactory bindDisconnect(Class clazz) {
+        clazzType.put((int) DISCONNECT, clazz);
+        return this;
+    }
     @Override
-    public Converter<byte[], ClientPublishMessage.MessageResponse> responseObjectConverter() {
-        return new ResponseProtobuffer();
+    public Class getClazzByType(int messageType) {
+        return clazzType.get(messageType);
     }
 
     @Override
-    public Converter<ClientPublishMessage.MessageRequst, byte[]> objectRequestConverter() {
+    public Converter<byte[], MessageNano> responseObjectConverter(Class clazz) {
+        return new ResponseProtobuffer(clazz);
+    }
+
+    @Override
+    public Converter<MessageNano, byte[]> objectRequestConverter() {
         return new ProtobufferRequest();
     }
 }
