@@ -26,12 +26,11 @@ import paho.mqtt.java.example.R;
 import static com.jd.im.mqtt.MQTTConstants.QOS_2;
 
 public class PahoExampleActivity extends AppCompatActivity implements MqttClient.PushCallBack<Object> {
-//    final String serverUri = "tcp://marsopen.cn/mars/sendmessage";
 
     //
-//    final String serverUri = "tcp://iot.eclipse.org:1883";
+    final String serverUri = "tcp://iot.eclipse.org:1883";
     //测试环境地址
-    final String serverUri = "tcp://172.25.47.19:8183";
+//    final String serverUri = "tcp://172.25.47.19:8183";
     //外网可访问
 //    final String serverUri = "tcp://59.151.64.31:8935";
 //    final String serverUri = "tcp://10.13.80.235:8183";
@@ -41,10 +40,7 @@ public class PahoExampleActivity extends AppCompatActivity implements MqttClient
     final String publishMessage = "Hello World!";
     ////
     String clientId = "PC;version=2.0.1.0430;uuid=0a092ds99a012897dbc";
-    //    final String subscriptionTopic = "exampleAndroidTopic";
-//    final String publishTopic = "exampleAndroidPublishTopic";
-//    final String publishMessage = "Hello World!";
-//    String clientId = "ExampleAndroidClient";
+
     private HistoryAdapter mAdapter;
 
     @Override
@@ -83,10 +79,9 @@ public class PahoExampleActivity extends AppCompatActivity implements MqttClient
                 .setServerURIs(new String[]{serverUri})
                 .setUserName("222")
                 .setPassword("sire")
-//                .setCleanSession(true)
                 .setProtocalName(MQTTVersion.VERSION_311)
-                .setProtocalName(MQTTVersion.VERSION_IM)
-                .setExtraHeaderPart(new IMProtocalExtraPart())
+//                .setProtocalName(MQTTVersion.VERSION_IM)
+//                .setExtraHeaderPart(new IMProtocalExtraPart())
                 ;
         MqttClient mqttClient = new MqttClient.Builder()
                 .context(this)
