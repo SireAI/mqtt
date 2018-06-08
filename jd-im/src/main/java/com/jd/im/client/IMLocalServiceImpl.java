@@ -24,7 +24,7 @@ import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
  * Description:主要处理服务端主动推送消息
  * =====================================================
  */
- class IMLocalServiceImpl extends IMLocalService.Stub implements BlockingLooper.Callback<Task> {
+class IMLocalServiceImpl extends IMLocalService.Stub implements BlockingLooper.Callback<Task> {
 
     private static final String TAG = "IMLocalServiceImpl";
     private final BlockingLooper<Task> pushBlockingLooper;
@@ -88,17 +88,22 @@ import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
                     int messageType = -1;
                     if (pushMessage instanceof MQTTPublish) {
                         messageType = PUBLISH;
-                    }else if(pushMessage instanceof MQTTDisconnect){
+                    } else if (pushMessage instanceof MQTTDisconnect) {
                         messageType = DISCONNECT;
-                    }else {
-                        Log.w(TAG,"message deserialize not support!");
+                    } else {
+                        Log.w(TAG, "message deserialize not support!");
                     }
-                    if(messageType!=-1){
-                        Object deserialize = converterProcessor.deserialize(((IMQTTMessage) pushMessage).getPayload(),messageType);
-                        if (deserialize != null) {
-                            clientReceiver.onPushArrived(messageType,deserialize);
+                    byte[] payload = ((IMQTTMessage) pushMessage).getPayload();
+                    if (messageType != -1) {
+                        if (messageType == DISCONNECT && (payload == null || payload.length == 0)) {
+                            clientReceiver.onPushArrived(messageType, null);
                         } else {
-                            Log.e(TAG, "反序列化错误...");
+                            Object deserialize = converterProcessor.deserialize(payload, messageType);
+                            if (deserialize != null) {
+                                clientReceiver.onPushArrived(messageType, deserialize);
+                            } else {
+                                Log.e(TAG, "反序列化错误...");
+                            }
                         }
                     }
                 } catch (RemoteException e) {

@@ -16,8 +16,10 @@ public class ResponseProtobuffer<T extends MessageNano> implements Converter<byt
 
     @Override
     public T convert(byte[] value) throws IOException, IllegalAccessException, InstantiationException {
-        if(clazz == null){
-            Log.e(TAG,"反序列化对象未绑定消息类型");
+        if (value == null || value.length == 0) {
+            return null;
+        } else if (clazz == null) {
+            Log.e(TAG, "反序列化对象未绑定消息类型");
             return null;
         }
         return MessageNano.mergeFrom(clazz.newInstance(), value);
