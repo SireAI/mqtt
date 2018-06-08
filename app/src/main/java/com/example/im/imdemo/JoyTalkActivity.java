@@ -72,23 +72,24 @@ public class PahoExampleActivity extends AppCompatActivity implements MqttClient
 
     private void connect() {
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions()
-                .setAutomaticReconnect(true)
-                .setCleanSession(false)
-                .setClientId(clientId)
-                .setKeepAliveInterval(60)
-                .setServerURIs(new String[]{serverUri})
-                .setUserName("222")
-                .setPassword("sire")
-                .setProtocalName(MQTTVersion.VERSION_311)
+                .setAutomaticReconnect(true)//是否启用重连机制，默认是
+                .setCleanSession(false)//是否清楚会话状态，默认否
+                .setClientId(clientId)//客户端唯一标识
+                .setKeepAliveInterval(8*60000)//服务端保持长连接最大时长
+                // ，若超过则会主动断开连接，此值会影响心跳探测最大间隔，建议使用默认8分钟
+                .setServerURIs(new String[]{serverUri})//服务器地址
+                .setUserName("222")//账号
+                .setPassword("sire")//密码
+                .setProtocalName(MQTTVersion.VERSION_311)//协议名，默认VERSION_311
 //                .setProtocalName(MQTTVersion.VERSION_IM)
 //                .setExtraHeaderPart(new IMProtocalExtraPart())
                 ;
         MqttClient mqttClient = new MqttClient.Builder()
                 .context(this)
-                .converter(ProtobufferConverterFactory.create())
-                .pushCallBack(this)
-                .qos(QOS_2)
-                .openLog()
+                .converter(ProtobufferConverterFactory.create())//默认的数据解析方式为String
+                .pushCallBack(this)//服务端主动push数据回调
+                .qos(QOS_2) //质量等级，默认是qos_1
+                .openLog() //是否打开调试日志，建议正式版本关闭
                 .build();
         mqttClient.connect(mqttConnectOptions, new MessageCallBack() {
             @Override
