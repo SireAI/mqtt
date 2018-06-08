@@ -1,0 +1,20 @@
+syntax = "proto3";
+package com.jd.im.image;
+
+
+//消息内容
+message Content{
+    string id = 1;        // 资源编号，资源服务器生产 不能重复
+    uint64 size = 2;            // 资源大小
+    string text = 3;            // 
+    int32 width = 4;           // 宽度
+    int32 height = 5;           // 高度
+	string type = 6;           // 图片类型
+	string file = 7;           // 文件名
+	string url = 8;           // 下载URL地址
+	int32 qMQTTlity = 9;           // 质量
+	int32 thumbLevel = 10;           // 缩略级别
+	bytes thumb = 11;           // 缩略图数据
+}
+
+
