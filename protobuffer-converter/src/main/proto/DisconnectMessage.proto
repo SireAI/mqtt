@@ -1,0 +1,51 @@
+syntax = "proto3";
+package com.jd.im.message.disconnect;
+enum RegistrationAction {
+	UNKNOWN = 0;
+    REGISTER = 100;                              // 用户主动注册
+    REGISTER_AND_DEREGISTER_ANOTHER = 101;       // 用户主动注册并且踢掉了另外一个终端
+    UNREGISTER = 200;                            // 没有注册
+    UNREGISTER_SOCKET_CLOSE = 201;               // 终端断开连接
+    UNREGISTER_BY_USER = 202;                    // 用户主动注销
+    UNREGISTER_UA_SESSION_EXPIRED = 205;         //MQTT测超期, 由UA负责注销服务
+    UNREGISTER_PERMANENT = 203;                  // 永久注销, 一定是用户发起
+    DEREGISTER= 300;                    		// 被平台注销
+    DEREGISTER_BY_ANOTHER_REGISTER = 301;       // 当另一个终端登录时, 被MC踢掉
+    DEREGISTER_BY_MANAGEMENT = 302;             // 被另一个终端的管理信令踢掉
+    DEREGISTER_PUBLISH_TIMEOUT = 303;           // 当终端不有效回应接收到消息时, 由MC注销该终端
+    DEREGISTER_PROVISIONING = 310;              // 业务变更引发负责注销
+	DEREGISTER_SYSTEM_OPERATION = 311;              // 系统维护
+	DEREGISTER_MANAGE_OPERATION = 312;              // 管理类注销
+	DEREGISTER_VERSION_EXPIRED = 313;              // 版本超期
+	DEREGISTER_LEGAL_REASON = 314;              // 因法规原因被注销
+	DEREGISTER_PERMANENT = 320;              // 永久注销, 由HTTP服务处理, MC负责通知
+}
+
+
+message Extension{
+	string key = 1;	//主键
+	bytes data = 2;	//值
+}
+
+//终端信息定义
+message UserEndpoint{
+	string epid = 1;	//终端ID
+	string clientIp = 2;	//客户端IP
+	fixed64 registerTime = 3;		//登录时间
+	fixed64 unregisterTime = 4;		//退出时间
+	repeated Extension extensions = 5;		//扩展集合
+
+}
+
+//消息内容
+message Disconnect{
+    int32 code = 1;        // 错误编码
+	string reason = 2;        // 错误原因
+	string link = 3;        // 链接地址
+	string description = 4;        // 描述
+    RegistrationAction action = 5;   // 动作
+    UserEndpoint userEndpoint = 6;       // 操作终端信息
+    fixed64 operationTime = 7;           // 操作时间
+}
+
+

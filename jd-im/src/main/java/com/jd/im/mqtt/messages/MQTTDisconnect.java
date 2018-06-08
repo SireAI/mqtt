@@ -6,55 +6,77 @@ import com.jd.im.mqtt.MQTTException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-
 import static com.jd.im.mqtt.MQTTConstants.DISCONNECT;
 
 
 public class MQTTDisconnect extends MQTTMessage {
 
-  public static MQTTDisconnect newInstance() {
-    return new MQTTDisconnect();
-  }
+    public MQTTDisconnect(byte[] data) {
+        int count = 0;
+        int i = 0;
+        // Type (just for clarity sake we'll set it...)
+        this.setType((byte) ((data[i++] >> 4) & 0x0F));
+        int multiplier = 1;
+        int remainingLength = 0;
+        byte digit = 0;
+        do {
+            digit = data[i++];
+            remainingLength += (digit & 127) * multiplier;
+            multiplier *= 128;
+        } while ((digit & 128) != 0);
+        if (remainingLength == -1) {
+            return;
+        }
+        payload = new byte[remainingLength];
+        System.arraycopy(data, i, payload, 0, payload.length);
+    }
 
 
-  private MQTTDisconnect() {
-    this.setType(DISCONNECT);
-  }
+    private MQTTDisconnect() {
+        this.setType(DISCONNECT);
+    }
 
-  @Override
-  protected byte[] generateFixedHeader() throws MQTTException, IOException {
-    // FIXED HEADER
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    public static MQTTDisconnect newInstance() {
+        return new MQTTDisconnect();
+    }
 
-    // Type
-    out.write((byte) (type << 4));
+    public static MQTTDisconnect fromBuffer(byte[] data) {
+        return new MQTTDisconnect(data);
+    }
 
-    // Flags (none for PING)
+    @Override
+    protected byte[] generateFixedHeader() throws MQTTException, IOException {
+        // FIXED HEADER
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-    // Remaining length
-    int length = variableHeader.length + payload.length;
-    this.setRemainingLength(length);
-    do {
-      byte digit = (byte) (length % 128);
-      length /= 128;
-      if (length > 0)
-        digit = (byte) (digit | 0x80);
-      out.write(digit);
-    } while (length > 0);
+        // Type
+        out.write((byte) (type << 4));
 
-    return out.toByteArray();
-  }
+        // Flags (none for PING)
 
-  @Override
-  protected byte[] generateVariableHeader() throws MQTTException, IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    return out.toByteArray();
-  }
+        // Remaining length
+        int length = variableHeader.length + payload.length;
+        this.setRemainingLength(length);
+        do {
+            byte digit = (byte) (length % 128);
+            length /= 128;
+            if (length > 0)
+                digit = (byte) (digit | 0x80);
+            out.write(digit);
+        } while (length > 0);
 
-  @Override
-  protected byte[] generatePayload() throws MQTTException, IOException {
-    ByteArrayOutputStream out = new ByteArrayOutputStream();
-    return out.toByteArray();
-  }
+        return out.toByteArray();
+    }
 
+    @Override
+    protected byte[] generateVariableHeader() throws MQTTException, IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        return out.toByteArray();
+    }
+
+    @Override
+    protected byte[] generatePayload() throws MQTTException, IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        return out.toByteArray();
+    }
 }

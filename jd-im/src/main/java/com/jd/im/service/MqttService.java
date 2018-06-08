@@ -8,9 +8,9 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import com.jd.im.utils.Log;
 
 import com.jd.im.ConnectStateCallBack;
 import com.jd.im.IMLocalService;
@@ -36,6 +36,7 @@ import com.jd.im.socket.TimingWheel;
 import com.jd.im.storage.DatabaseMessageStore;
 import com.jd.im.storage.MessageStore;
 import com.jd.im.storage.Persistentable;
+import com.jd.im.utils.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -203,7 +204,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     @WorkerThread
     @Override
     public void onSocketFailed(final int type, Exception e) {
-        dataWorkerSender.post(new Runnable() {
+        sendTask(new Runnable() {
             @Override
             public void run() {
                 if (type == SocketCallBack.CONNECT_EXCEPTION) {
@@ -248,22 +249,14 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     /**
      * 连接关闭前发送disconnect消息，调用者线程
      */
+    @WorkerThread
     @Override
     public void onSocketClose(final Runnable task) {
         if (socketWorer != null) {
-            dataWorkerSender.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (socketWorer != null) {
-                        socketWorer.sendData(MQTTDisconnect.newInstance().get());
-                        socketWorer = null;
-                    }
-                    task.run();
-                }
-            });
-        } else {
-            task.run();
+            socketWorer.sendData(MQTTDisconnect.newInstance().get());
+            socketWorer = null;
         }
+        task.run();
     }
 
     /**
@@ -298,7 +291,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
                 deliveryRetrayPost(event);
             } else {
                 MqttSenderAction mqttSenderAction = new MqttSenderAction(socketWorer, msg);
-                dataWorkerSender.post(mqttSenderAction);
+                sendTask(mqttSenderAction);
             }
         }
     }
@@ -368,6 +361,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
             messageStore.discardArrived(clientHandle, id + "");
         }
     }
+
 
 
     /**
@@ -525,7 +519,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      * @param task
      */
     private void sendTask(Runnable task) {
-        if (socketWorer != null && dataWorkerSender != null) {
+        if (socketWorer != null && socketWorer.isAlive() && dataWorkerSender != null) {
             dataWorkerSender.post(task);
         }
     }
@@ -727,7 +721,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         if (event.getAction() == null) {
             throw new RuntimeException("事件任务不能为空");
         }
-        dataWorkerSender.post(event.getAction());
+        sendTask(event.getAction());
         eventTimingWheel.add(event);
     }
 
@@ -748,7 +742,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
             try {
                 event = new Event<>();
                 MqttSenderAction mqttSenderAction = new MqttSenderAction(socketWorer, msg);
-                if(!(msg instanceof Persistentable &&  ((Persistentable)msg).isPersistent())){
+                if (!(msg instanceof Persistentable && ((Persistentable) msg).isPersistent())) {
                     mqttSenderAction.setPersistentDataAction(new PersistentDataAction(this, msg));
                 }
                 event.setAction(mqttSenderAction);
@@ -818,7 +812,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         return eventTimingWheel;
     }
 
-     MqttQos getMqttQos() {
+    MqttQos getMqttQos() {
         return mqttQos;
     }
 
@@ -828,7 +822,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     private void resumeData() {
         if (dataWorkerSender != null) {
             RestoreDataAction restoreDataAction = new RestoreDataAction(this);
-            dataWorkerSender.post(restoreDataAction);
+            sendTask(restoreDataAction);
         }
     }
 

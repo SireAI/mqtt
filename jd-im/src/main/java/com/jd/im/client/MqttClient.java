@@ -12,7 +12,6 @@ import android.os.RemoteException;
 import android.support.annotation.MainThread;
 import android.support.annotation.WorkerThread;
 
-import com.jd.im.BuildConfig;
 import com.jd.im.ConnectStateCallBack;
 import com.jd.im.IMLocalService;
 import com.jd.im.IMRemoteService;
@@ -28,6 +27,8 @@ import static com.jd.im.mqtt.MQTTConnectionConstants.STATE_CONNECTED;
 import static com.jd.im.mqtt.MQTTConnectionConstants.STATE_CONNECTING;
 import static com.jd.im.mqtt.MQTTConnectionConstants.STATE_CONNECTION_FAILED;
 import static com.jd.im.mqtt.MQTTConnectionConstants.STATE_NONE;
+import static com.jd.im.mqtt.MQTTConstants.DISCONNECT;
+import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
 import static com.jd.im.mqtt.MQTTConstants.QOS_1;
 
 /**
@@ -58,7 +59,7 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
     /**
      * 连接监听回调
      */
-    private MessageCallBack connectCallBack;
+    private ConnectCallBack connectCallBack;
     /**
      * 初始化
      */
@@ -214,10 +215,10 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
      * 建立连接
      *
      * @param mqttConnectOptions 连接配置
-     * @param messageCallBack    连接回调，反映连接在连接过程中的变化
+     * @param connectCallBack    连接回调，反映连接在连接过程中的变化
      */
-    public void connect(IMqttConnectOptions mqttConnectOptions, MessageCallBack messageCallBack) {
-        this.connectCallBack = messageCallBack;
+    public void connect(IMqttConnectOptions mqttConnectOptions, ConnectCallBack connectCallBack) {
+        this.connectCallBack = connectCallBack;
         connect(mqttConnectOptions);
     }
 
@@ -389,12 +390,12 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
                 case STATE_NONE:
                     MQTTException mqttException = new MQTTException("连接失败...");
                     Log.d(TAG, "connect state change:" + mqttException.getMessage());
-                    connectCallBack.onFailed(mqttException);
+                    connectCallBack.onConnectLoss(mqttException);
                     notifyMessageCallbacksFailed(mqttException);
                     break;
                 case STATE_CONNECTED:
                     Log.d(TAG, "connect state change:" + "连接验证成功...");
-                    connectCallBack.onSuccess();
+                    connectCallBack.onConnectSuccess();
                     break;
                 case STATE_CONNECTING:
                     Log.d(TAG, "connect state change:" + "正在连接...");
@@ -415,14 +416,18 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
     /**
      * 服务端推送消息
      *
+     * @param messageType
      * @param message
      */
     @WorkerThread
     @Override
-    public void onPushArrived(Object message) {
+    public void onPushArrived(int messageType, Object message) {
         Log.d(TAG, "a message has arrived : \n" + message.toString());
-        if (callBack != null) {
+        if (callBack != null && messageType == PUBLISH) {
             callBack.onPush(message);
+        }else if(connectCallBack!=null && messageType == DISCONNECT){
+            disconnect();
+            connectCallBack.onKickOff(message);
         }
     }
 

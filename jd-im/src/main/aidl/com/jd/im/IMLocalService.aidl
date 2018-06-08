@@ -13,5 +13,4 @@ interface IMLocalService {
     */
    void operationResult(boolean success,int id);
 
-
 }

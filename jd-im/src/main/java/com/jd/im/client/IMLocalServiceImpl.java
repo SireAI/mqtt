@@ -6,11 +6,15 @@ import com.jd.im.IMLocalService;
 import com.jd.im.IMQTTMessage;
 import com.jd.im.converter.Converter;
 import com.jd.im.converter.ConverterProcessor;
+import com.jd.im.mqtt.messages.MQTTDisconnect;
+import com.jd.im.mqtt.messages.MQTTPublish;
 import com.jd.im.socket.BlockingLooper;
 import com.jd.im.utils.Log;
 
 import static com.jd.im.client.Task.DESERIALIZE_RESPONSE;
 import static com.jd.im.client.Task.SERIALIZE_REQUEST;
+import static com.jd.im.mqtt.MQTTConstants.DISCONNECT;
+import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
 
 /**
  * =====================================================
@@ -20,7 +24,7 @@ import static com.jd.im.client.Task.SERIALIZE_REQUEST;
  * Description:主要处理服务端主动推送消息
  * =====================================================
  */
- class IMLocalServiceImpl extends IMLocalService.Stub implements BlockingLooper.Callback<Task> {
+class IMLocalServiceImpl extends IMLocalService.Stub implements BlockingLooper.Callback<Task> {
 
     private static final String TAG = "IMLocalServiceImpl";
     private final BlockingLooper<Task> pushBlockingLooper;
@@ -51,6 +55,7 @@ import static com.jd.im.client.Task.SERIALIZE_REQUEST;
         }
     }
 
+
     @Override
     public boolean meetTheCondition() {
         return true;
@@ -80,12 +85,25 @@ import static com.jd.im.client.Task.SERIALIZE_REQUEST;
             } else if (task.getType() == DESERIALIZE_RESPONSE) {
                 try {
                     Object pushMessage = task.getObject();
-                    if (pushMessage instanceof IMQTTMessage) {
-                        Object deserialize = converterProcessor.deserialize(((IMQTTMessage) pushMessage).getPayload());
-                        if (deserialize != null) {
-                            clientReceiver.onPushArrived(deserialize);
+                    int messageType = -1;
+                    if (pushMessage instanceof MQTTPublish) {
+                        messageType = PUBLISH;
+                    } else if (pushMessage instanceof MQTTDisconnect) {
+                        messageType = DISCONNECT;
+                    } else {
+                        Log.w(TAG, "message deserialize not support!");
+                    }
+                    byte[] payload = ((IMQTTMessage) pushMessage).getPayload();
+                    if (messageType != -1) {
+                        if (messageType == DISCONNECT && (payload == null || payload.length == 0)) {
+                            clientReceiver.onPushArrived(messageType, null);
                         } else {
-                            Log.e(TAG, "反序列化错误...");
+                            Object deserialize = converterProcessor.deserialize(payload, messageType);
+                            if (deserialize != null) {
+                                clientReceiver.onPushArrived(messageType, deserialize);
+                            } else {
+                                Log.e(TAG, "反序列化错误...");
+                            }
                         }
                     }
                 } catch (RemoteException e) {
@@ -99,7 +117,7 @@ import static com.jd.im.client.Task.SERIALIZE_REQUEST;
     }
 
     interface ClientReceiver {
-        void onPushArrived(Object message);
+        void onPushArrived(int messageType, Object message);
 
         void onOperationCallBack(boolean success, int id);
 

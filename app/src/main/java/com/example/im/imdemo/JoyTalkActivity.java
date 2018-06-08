@@ -9,28 +9,34 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.google.protobuf.ByteString;
+import com.jd.im.client.ConnectCallBack;
 import com.jd.im.client.MessageCallBack;
 import com.jd.im.client.MqttClient;
 import com.jd.im.converter.ProtobufferConverterFactory;
-import com.jd.im.message.ClientPublishMessage;
+import com.jd.im.message.disconnect.nano.DisconnectMessage;
+import com.jd.im.message.nano.ClientPublishMessage;
 import com.jd.im.mqtt.IMProtocalExtraPart;
 import com.jd.im.mqtt.MQTTException;
 import com.jd.im.mqtt.MQTTVersion;
 import com.jd.im.mqtt.MqttConnectOptions;
+import com.jd.im.utils.Log;
 
 import java.util.ArrayList;
 
+
 import paho.mqtt.java.example.R;
 
+import static com.jd.im.message.nano.ClientPublishMessage.CHAT;
+import static com.jd.im.mqtt.MQTTConstants.DISCONNECT;
+import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
 import static com.jd.im.mqtt.MQTTConstants.QOS_2;
 
 public class JoyTalkActivity extends AppCompatActivity implements MqttClient.PushCallBack<Object> {
-
+    private static final String TAG = "JoyTalkActivity";
     //
-    final String serverUri = "tcp://iot.eclipse.org:1883";
+//    final String serverUri = "tcp://iot.eclipse.org:1883";
     //测试环境地址
-//    final String serverUri = "tcp://172.25.47.19:8183";
+    final String serverUri = "tcp://172.25.47.19:8183";
     //外网可访问
 //    final String serverUri = "tcp://59.151.64.31:8935";
 //    final String serverUri = "tcp://10.13.80.235:8183";
@@ -47,10 +53,10 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,7 +65,7 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
         });
 
 
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.history_recycler_view);
+        RecyclerView mRecyclerView = findViewById(R.id.history_recycler_view);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -81,26 +87,35 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
                 .setUserName("222")//账号
                 .setPassword("sire")//密码
                 .setProtocalName(MQTTVersion.VERSION_311)//协议名，默认VERSION_311
-//                .setProtocalName(MQTTVersion.VERSION_IM)
-//                .setExtraHeaderPart(new IMProtocalExtraPart())
+                .setProtocalName(MQTTVersion.VERSION_IM)
+                .setExtraHeaderPart(new IMProtocalExtraPart())
                 ;
         MqttClient mqttClient = new MqttClient.Builder()
                 .context(this)
-                .converter(ProtobufferConverterFactory.create())//默认的数据解析方式为String
+                .converter(ProtobufferConverterFactory.create()
+                        .bindPublish(ClientPublishMessage.MessageResponse.class)
+                        .bindDisconnect(DisconnectMessage.Disconnect.class))//默认的数据解析方式为String
                 .pushCallBack(this)//服务端主动push数据回调
                 .qos(QOS_2) //质量等级，默认是qos_1
                 .openLog() //是否打开调试日志，建议正式版本关闭
                 .build();
-        mqttClient.connect(mqttConnectOptions, new MessageCallBack() {
+        mqttClient.connect(mqttConnectOptions, new ConnectCallBack<DisconnectMessage.Disconnect>() {
+
+
             @Override
-            public void onSuccess() {
-                System.out.println("==============onSuccess");
-//                subscribe();
+            public  void onKickOff(DisconnectMessage.Disconnect kickInfor) {
+                Log.d(TAG,"被踢下线："+kickInfor.toString());
             }
 
             @Override
-            public void onFailed(MQTTException exception) {
-                System.out.println("==============onFailed:"+exception.getMessage());
+            public void onConnectSuccess() {
+                Log.d(TAG,"连接成功=====");
+
+            }
+
+            @Override
+            public void onConnectLoss(MQTTException excetion) {
+                Log.d(TAG,"连接失败=====");
             }
         });
 
@@ -211,31 +226,29 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
     private void publish() {
         //uidL:xxx   与用户相同
         String contentStr = "你好世界";
-        ClientPublishMessage.Content content = ClientPublishMessage.Content.newBuilder()
-                .setUuid("222222222222")
-                .setFromUri("uid:222")
-                .setFromEpid(clientId)
-                .setFromNickname("sire")
-                .setContentType("text/plain")
-                .setContentBuffer(ByteString.copyFrom(contentStr.getBytes()))
-                .build();
-        ClientPublishMessage.Receiver receiver = ClientPublishMessage.Receiver.newBuilder()
-                .setToUri("uid:111111")
-                .setToEpid("PC;version=2.0.1.0430;uuid=111111")
-                .setExceptThisEpid(false)
-                .build();
-        ClientPublishMessage.MessageRequst result = ClientPublishMessage.MessageRequst.newBuilder()
-                .setMessageType(ClientPublishMessage.MessageType.CHAT)
-                .setOptions("1")
-                .setContent(content)
-                .addReceivers(receiver)
-                .setPeerUri("uid:111111")
-                .setTopic("RT").build();
+        ClientPublishMessage.Content content = new ClientPublishMessage.Content();
+        content.uuid = "222222222222";
+        content.fromUri = "uid:222";
+        content.fromEpid = clientId;
+        content.fromNickname = "sire";
+        content.contentType = "text/plain";
+        content.contentBuffer = contentStr.getBytes();
+        ClientPublishMessage.Receiver receiver = new ClientPublishMessage.Receiver();
+        receiver.toUri = "uid:111111";
+        receiver.toEpid = "PC;version=2.0.1.0430;uuid=111111";
+        receiver.exceptThisEpid = false;
+        ClientPublishMessage.MessageRequst messageRequst = new ClientPublishMessage.MessageRequst();
+        messageRequst.messageType = CHAT;
+        messageRequst.options = "1";
+        messageRequst.content = content;
+        messageRequst.receivers = new ClientPublishMessage.Receiver[]{receiver};
+        messageRequst.peerUri = "uid:111111";
+        messageRequst.topic = "RT";
 
-//        String topic = "RT";
-//        Object payload = result;
-        String topic = publishTopic;
-        Object payload = publishMessage;
+        String topic = "RT";
+        Object payload = messageRequst;
+//        String topic = publishTopic;
+//        Object payload = publishMessage;
         MqttClient.getInstance(this).publish(topic, payload, new MessageCallBack() {
             @Override
             public void onSuccess() {
@@ -249,7 +262,6 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
 
             }
         });
-
     }
 
 

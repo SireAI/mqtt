@@ -75,7 +75,7 @@ MqttClient.getInstance().subscribe("我是被订阅的主题", new MessageCallBa
 ```
 #####取消订阅消息
 ```
- MqttClient.getInstance().unSubscribe("我是被订阅的消息", new MessageCallBack() {
+ MqttClient.getInstance().unSubscribe("我是被订阅的主题", new MessageCallBack() {
             @Override
             public void onSuccess() {
             }
@@ -87,7 +87,7 @@ MqttClient.getInstance().subscribe("我是被订阅的主题", new MessageCallBa
 ```
 #####发布消息
 ```
-MqttClient.getInstance().publish("我是被订阅的消息", "hello world", new MessageCallBack() {
+MqttClient.getInstance().publish("我是被订阅的主题", "hello world", new MessageCallBack() {
             @Override
             public void onSuccess() {
             }

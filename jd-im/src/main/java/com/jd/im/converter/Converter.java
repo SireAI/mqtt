@@ -20,7 +20,7 @@ public interface Converter<F, T> {
      * @return
      * @throws IOException
      */
-    T convert(F value) throws IOException;
+    T convert(F value) throws IOException, IllegalAccessException, InstantiationException;
 
     /**
      * 对象工厂
@@ -28,12 +28,18 @@ public interface Converter<F, T> {
      interface Factory {
 
         /**
+         * 消息类型与解析对象的映射关系
+         * @param messageType
+         */
+        Class getClazzByType(int messageType);
+
+        /**
          * 字节转换为对象
          *
          * @return
          */
         public @Nullable
-        Converter<byte[], ?> responseObjectConverter() ;
+        Converter<byte[], ?> responseObjectConverter(Class clazz) ;
 
         /**
          * 对象转换为字节
