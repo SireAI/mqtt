@@ -25,7 +25,7 @@ import paho.mqtt.java.example.R;
 
 import static com.jd.im.mqtt.MQTTConstants.QOS_2;
 
-public class PahoExampleActivity extends AppCompatActivity implements MqttClient.PushCallBack<Object> {
+public class JoyTalkActivity extends AppCompatActivity implements MqttClient.PushCallBack<Object> {
 
     //
     final String serverUri = "tcp://iot.eclipse.org:1883";
