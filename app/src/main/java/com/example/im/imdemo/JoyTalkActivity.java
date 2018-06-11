@@ -1,5 +1,7 @@
 package com.example.im.imdemo;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,11 +17,13 @@ import com.jd.im.client.MqttClient;
 import com.jd.im.converter.ProtobufferConverterFactory;
 import com.jd.im.message.disconnect.nano.DisconnectMessage;
 import com.jd.im.message.nano.ClientPublishMessage;
+import com.jd.im.message.nano.ImageMessage;
 import com.jd.im.mqtt.IMProtocalExtraPart;
 import com.jd.im.mqtt.MQTTException;
 import com.jd.im.mqtt.MQTTVersion;
 import com.jd.im.mqtt.MqttConnectOptions;
 import com.jd.im.utils.Log;
+import com.jd.jrapp.bm.im.service.JDMqttService;
 
 import java.util.ArrayList;
 
@@ -29,14 +33,15 @@ import paho.mqtt.java.example.R;
 import static com.jd.im.message.nano.ClientPublishMessage.CHAT;
 import static com.jd.im.mqtt.MQTTConstants.DISCONNECT;
 import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
+import static com.jd.im.mqtt.MQTTConstants.QOS_1;
 import static com.jd.im.mqtt.MQTTConstants.QOS_2;
 
 public class JoyTalkActivity extends AppCompatActivity implements MqttClient.PushCallBack<Object> {
     private static final String TAG = "JoyTalkActivity";
     //
-//    final String serverUri = "tcp://iot.eclipse.org:1883";
+    final String serverUri = "tcp://iot.eclipse.org:1883";
     //测试环境地址
-    final String serverUri = "tcp://172.25.47.19:8183";
+//    final String serverUri = "tcp://172.25.47.19:8183";
     //外网可访问
 //    final String serverUri = "tcp://59.151.64.31:8935";
 //    final String serverUri = "tcp://10.13.80.235:8183";
@@ -72,8 +77,16 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
         mAdapter = new HistoryAdapter(new ArrayList<String>());
         mRecyclerView.setAdapter(mAdapter);
 
-
-        connect();
+        if(true){
+            connect();
+        }else {
+            Intent intent = new Intent(this, JDMqttService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent);
+            }else {
+                startService(intent);
+            }
+        }
     }
 
     private void connect() {
@@ -87,8 +100,8 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
                 .setUserName("222")//账号
                 .setPassword("sire")//密码
                 .setProtocalName(MQTTVersion.VERSION_311)//协议名，默认VERSION_311
-                .setProtocalName(MQTTVersion.VERSION_IM)
-                .setExtraHeaderPart(new IMProtocalExtraPart())
+//                .setProtocalName(MQTTVersion.VERSION_IM)
+//                .setExtraHeaderPart(new IMProtocalExtraPart())
                 ;
         MqttClient mqttClient = new MqttClient.Builder()
                 .context(this)
@@ -96,7 +109,7 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
                         .bindPublish(ClientPublishMessage.MessageResponse.class)
                         .bindDisconnect(DisconnectMessage.Disconnect.class))//默认的数据解析方式为String
                 .pushCallBack(this)//服务端主动push数据回调
-                .qos(QOS_2) //质量等级，默认是qos_1
+                .qos(QOS_1) //质量等级，默认是qos_1
                 .openLog() //是否打开调试日志，建议正式版本关闭
                 .build();
         mqttClient.connect(mqttConnectOptions, new ConnectCallBack<DisconnectMessage.Disconnect>() {
@@ -104,18 +117,17 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
 
             @Override
             public  void onKickOff(DisconnectMessage.Disconnect kickInfor) {
-                Log.d(TAG,"被踢下线："+kickInfor.toString());
+                //被踢下线
             }
 
             @Override
             public void onConnectSuccess() {
-                Log.d(TAG,"连接成功=====");
-
+                //连接成功
             }
 
             @Override
             public void onConnectLoss(MQTTException excetion) {
-                Log.d(TAG,"连接失败=====");
+                //连接失败
             }
         });
 
@@ -171,10 +183,11 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
 
     public void publishMessage() {
 //        connect();
-        publish();
+//        publish();
 //        disconnect();
 //        subscribe();
-//        unSubscribe();
+//        unSubscribe();//有问题，订阅无法取消
+        publishImage();
         try {
 //            MqttMessage message = new MqttMessage();
 //            message.setPayload(publishMessage.getBytes());
@@ -259,6 +272,32 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
             public void onFailed(MQTTException exception) {
                 System.out.println("发布失败。。。");
                 System.out.println("==============onFailed:"+exception.getMessage());
+
+            }
+        });
+    }
+
+    public void publishImage(){
+        ImageMessage.Image image = new ImageMessage.Image();
+        image.file  = "423424.jpg";
+        image.height = 200;
+        image.width = 300;
+        image.id = "3213131";
+        image.qMQTTlity = 9;
+        image.size = 3221424;
+        image.text = "fasdfsaf";
+        image.thumb = new byte[100];
+        image.thumbLevel = 11;
+        image.type = "32";
+        image.url = "http://www.baidu.com";
+        MqttClient.getInstance().publish("RT", image, new MessageCallBack() {
+            @Override
+            public void onSuccess() {
+                System.out.println("图片消息发送成功===========");
+            }
+
+            @Override
+            public void onFailed(MQTTException exception) {
 
             }
         });

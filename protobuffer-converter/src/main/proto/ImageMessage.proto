@@ -1,9 +1,9 @@
 syntax = "proto3";
-package com.jd.im.image;
+package com.jd.im.message;
 
 
 //消息内容
-message Content{
+message Image{
     string id = 1;        // 资源编号，资源服务器生产 不能重复
     uint64 size = 2;            // 资源大小
     string text = 3;            // 

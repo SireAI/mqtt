@@ -1,1 +1,1 @@
-include ':app', ':jd-im', ':protobuffer-converter'
+include ':app', ':jd-im', ':protobuffer-converter', ':jd-jrapp-bm-im'

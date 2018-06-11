@@ -51,13 +51,22 @@ joytalk是京东金融以mqtt协议为通讯协议的Android客户端长连接�
 连接的回调在应用的整个生命周期内有效，连接的状态会通过此回调报告。
 
 ```
-mqttClient.connect(mqttConnectOptions, new MessageCallBack() {
+mqttClient.connect(mqttConnectOptions, new ConnectCallBack<DisconnectMessage.Disconnect>() {
+
+
             @Override
-            public void onSuccess() {
+            public  void onKickOff(DisconnectMessage.Disconnect kickInfor) {
+                //被踢下线(服务端发送disconnect消息，客户端主动关闭链接，服务端可以在disconnect消息中写入payload内容说明踢线原因，也可以不写，不写的情况此处回调参数 kickInfor = null)
             }
 
             @Override
-            public void onFailed(MQTTException exception) {
+            public void onConnectSuccess() {
+                //连接成功
+            }
+
+            @Override
+            public void onConnectLoss(MQTTException excetion) {
+                //连接失败
             }
         });
 ```

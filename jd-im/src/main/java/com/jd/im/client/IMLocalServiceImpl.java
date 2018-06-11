@@ -6,8 +6,6 @@ import com.jd.im.IMLocalService;
 import com.jd.im.IMQTTMessage;
 import com.jd.im.converter.Converter;
 import com.jd.im.converter.ConverterProcessor;
-import com.jd.im.mqtt.messages.MQTTDisconnect;
-import com.jd.im.mqtt.messages.MQTTPublish;
 import com.jd.im.socket.BlockingLooper;
 import com.jd.im.utils.Log;
 
@@ -85,26 +83,19 @@ class IMLocalServiceImpl extends IMLocalService.Stub implements BlockingLooper.C
             } else if (task.getType() == DESERIALIZE_RESPONSE) {
                 try {
                     Object pushMessage = task.getObject();
-                    int messageType = -1;
-                    if (pushMessage instanceof MQTTPublish) {
-                        messageType = PUBLISH;
-                    } else if (pushMessage instanceof MQTTDisconnect) {
-                        messageType = DISCONNECT;
-                    } else {
-                        Log.w(TAG, "message deserialize not support!");
-                    }
-                    byte[] payload = ((IMQTTMessage) pushMessage).getPayload();
-                    if (messageType != -1) {
-                        if (messageType == DISCONNECT && (payload == null || payload.length == 0)) {
-                            clientReceiver.onPushArrived(messageType, null);
-                        } else {
-                            Object deserialize = converterProcessor.deserialize(payload, messageType);
-                            if (deserialize != null) {
-                                clientReceiver.onPushArrived(messageType, deserialize);
-                            } else {
-                                Log.e(TAG, "反序列化错误...");
-                            }
+                    IMQTTMessage message = (IMQTTMessage) pushMessage;
+                    byte type = message.getType();
+                    byte[] payload = message.getPayload();
+                    if (type == DISCONNECT ) {
+                        if(payload == null || payload.length == 0){
+                            clientReceiver.onPushArrived(type, null);
+                        }else {
+                            deserializeOut(type,payload);
                         }
+                    } else if (type == PUBLISH) {
+                        deserializeOut(type, payload);
+                    } else {
+                        Log.w(TAG,"message deserialize not support!");
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -113,6 +104,15 @@ class IMLocalServiceImpl extends IMLocalService.Stub implements BlockingLooper.C
             } else {
                 Log.e(TAG, "任务类型未定义...");
             }
+        }
+    }
+
+    private void deserializeOut(byte type, byte[] payload) {
+        Object deserialize = converterProcessor.deserialize(payload, type);
+        if (deserialize != null) {
+            clientReceiver.onPushArrived(type, deserialize);
+        } else {
+            Log.e(TAG, "反序列化错误...");
         }
     }
 

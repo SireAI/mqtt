@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 import android.support.annotation.MainThread;
 import android.support.annotation.WorkerThread;
@@ -464,6 +465,7 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
      * 释放资源
      */
     public void onDestroy() {
+        disconnect();
         app = null;
         instance = null;
         modeListener = null;
