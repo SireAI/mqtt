@@ -1,0 +1,11 @@
+syntax = "proto3";
+package com.jd.im.message;
+//消息内容
+message MessageAck{
+    int32 code = 1;        // 返回码
+    string reason = 2;            // 返回理由
+    uint64 msgId = 3;           // 消息编号
+    fixed64 msgTime = 4;           // 消息时间
+}
+
+

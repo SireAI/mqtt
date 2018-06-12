@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.jd.jrapp.bm.message" >
+
+    <application>
+        <service android:name="com.jd.jrapp.bm.message.service.JDMqttService" />
+    </application>
+</manifest>
