@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.sire.corelibrary.Utils.TimeConverterUtils" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="imMessage"
+            type="com.sire.messagepushmodule.DB.Entry.IMMessage" />
+
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left">
+
+        <TextView
+            android:id="@+id/tv_message_time"
+            style="@style/caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+
+            android:layout_marginTop="5dp"
+            android:background="@drawable/shape_im_time_bg"
+            android:paddingBottom="1dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="1dp"
+            android:text="@{TimeConverterUtils.getManKindDate(imMessage.messageCreateTime)}"
+            android:textColor="@android:color/white"
+            android:visibility="@{imMessage.showTime?View.VISIBLE:View.GONE}" />
+
+        <ImageView
+            android:id="@+id/iv_left"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/tv_message_time"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="7dp"
+            android:cirlce="@{false}"
+            android:imageUrl="@{imMessage.fromAuthorImg}" />
+
+        <TextView
+            style="@style/body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_message_time"
+            android:layout_marginEnd="50dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="7dp"
+            android:layout_toEndOf="@id/iv_left"
+            android:background="@drawable/im_left_bubble"
+            android:gravity="left|center_vertical"
+            android:minHeight="45dp"
+            android:paddingBottom="13dp"
+            android:paddingLeft="23dp"
+            android:paddingRight="13dp"
+            android:paddingTop="13dp"
+            android:text="@{imMessage.content}"
+            tool:text="dfsfdsafsafasfdasdfasdfasdfasdfasdfasdfasdfsdfsafasfdasdfdsfsfdssaff" />
+    </RelativeLayout>
+</layout>

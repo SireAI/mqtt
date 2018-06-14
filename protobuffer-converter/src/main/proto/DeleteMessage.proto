@@ -1,0 +1,11 @@
+syntax = "proto3";
+package im.entity;
+option java_package = "com.wangyin.im.entity";
+option java_outer_classname = "ClientPublishReport";
+
+//消息内容
+message SendMessageReport{
+    uint64 receivedMsgId = 1;            // 接收的消息编号
+}
+
+

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools">
+
+    <data>
+        <import type="com.sire.corelibrary.Utils.TimeConverterUtils" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="imMessage"
+            type="com.sire.messagepushmodule.DB.Entry.IMMessage" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <TextView
+            android:visibility="@{imMessage.showTime?View.VISIBLE:View.GONE}"
+            android:id="@+id/tv_message_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/caption"
+            android:textColor="@android:color/white"
+            android:text="@{TimeConverterUtils.getManKindDate(imMessage.messageCreateTime)}"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="1dp"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="1dp"
+            android:background="@drawable/shape_im_time_bg"
+            />
+        <TextView
+            style="@style/body1"
+            android:gravity="left|center_vertical"
+            android:layout_below="@id/tv_message_time"
+            android:layout_marginTop="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="45dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/im_right_bubble"
+            android:paddingBottom="13dp"
+            android:paddingLeft="13dp"
+            android:paddingRight="23dp"
+            android:paddingTop="13dp"
+            android:layout_marginStart="50dp"
+            android:text="@{imMessage.content}"
+            android:layout_toStartOf="@id/iv_right"
+            tool:text="fdsaffasfdsafadsfsfsadfsafasfsafsfsafsafasdfsafdfdasfsafasdfsadafasfdsafasdfsafsafsafasdfasdfadsfasfsa" />
+
+        <ImageView
+            android:id="@+id/iv_right"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_below="@id/tv_message_time"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="10dp"
+            android:cirlce="@{false}"
+            android:layout_alignParentRight="true"
+            android:imageUrl="@{imMessage.fromAuthorImg}" />
+    </RelativeLayout>
+</layout>
