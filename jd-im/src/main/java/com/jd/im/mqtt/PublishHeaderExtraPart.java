@@ -17,7 +17,8 @@ public class IMProtocalExtraPart extends IVariableHeaderExtraPart.Stub {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         //数据编码类型,默认protobuffer  v3
         int codingType = 3;//
-        //消息操作类型，IM聊天或信息上报
+        //消息操作类型，IM聊天或信息上报1,
+        //1代表普通消息发送，2代表消息到达回执，3代表离线
         int messageType = 1;
         byte extraInfor = (byte) (((codingType << 4) | ((messageType >> 8) & 0xF)) & 0xFF);
         byte operationType = (byte) (messageType & 0xFF);

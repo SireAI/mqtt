@@ -1,4 +1,4 @@
-package com.sire.corelibrary.DataBindings;
+package com.jd.jrapp.bm.message.adapter;
 
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
@@ -9,9 +9,10 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.sire.corelibrary.DI.Environment.GlideConfigure;
-import com.sire.corelibrary.R;
+import com.jd.jrapp.bm.message.R;
+
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
@@ -30,12 +31,11 @@ public class CommonDatabindingAdapter {
         if (circle) {
             Glide.with(view.getContext()).asBitmap()
                     .load(url)
-                    .apply(GlideConfigure.getConfigure(DiskCacheStrategy.AUTOMATIC))
                     .into(new BitmapImageViewTarget(view) {
                         @Override
                         protected void setResource(Bitmap resource) {
                             if (resource == null) {
-                                resource = BitmapFactory.decodeResource(view.getContext().getResources(), R.drawable.logo_grey);
+                                resource = BitmapFactory.decodeResource(view.getContext().getResources(), R.drawable.svg_emoji);
                             }
                             RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(view.getResources(), resource);
                             roundedBitmapDrawable.setCircular(true);
@@ -46,7 +46,6 @@ public class CommonDatabindingAdapter {
         } else {
             Glide.with(view.getContext())
                     .load(url)
-                    .apply(GlideConfigure.getConfigure(DiskCacheStrategy.AUTOMATIC))
                     .transition(withCrossFade())
                     .into(view);
         }
