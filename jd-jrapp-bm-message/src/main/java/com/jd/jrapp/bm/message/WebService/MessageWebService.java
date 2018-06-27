@@ -1,6 +1,10 @@
 package com.jd.jrapp.bm.message.WebService;
 
 
+import okhttp3.RequestBody;
+import retrofit2.http.Body;
+import retrofit2.http.POST;
+import retrofit2.http.Url;
 
 /**
  * ==================================================
@@ -12,6 +16,6 @@ package com.jd.jrapp.bm.message.WebService;
  */
 public interface MessagePushWebService {
 
-//    @POST("feed/imtalk")
-//    LiveData<Response<JsonResponse<IMMessage>>> imtalk(@Body IMMessage imMessage);
+    @POST()
+    LiveData<Response<JsonResponse<User>>> uploadFile(@Url String fileUrl , @Body RequestBody Body);
 }

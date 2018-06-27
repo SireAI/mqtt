@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="com.jd.jrapp.bm.message.utils.TimeConverterUtils" />
+
+        <import type="android.view.View" />
+
+        <import type="com.jd.im.converter.MsgContentResolve" />
+
+        <variable
+            name="imMessage"
+            type="com.jd.jrapp.bm.message.db.IMMessage" />
+
+        <variable
+            name="delegate"
+            type="com.jd.jrapp.bm.message.adapter.delegate.RightTalkerTextDelegate" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="left">
+
+        <TextView
+            android:id="@+id/tv_message_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/shape_im_time_bg"
+            android:paddingBottom="4dp"
+            android:paddingLeft="14dp"
+            android:paddingRight="14dp"
+            android:paddingTop="4dp"
+            android:text="@{TimeConverterUtils.getManKindDate(imMessage.messageCreateTime)}"
+            android:textColor="@android:color/white"
+            android:textSize="12dp"
+            android:visibility="@{imMessage.showTime?View.VISIBLE:View.GONE}" />
+
+        <ImageView
+            android:id="@+id/iv_left"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/tv_message_time"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="15dp"
+            android:cirlce="@{true}"
+            android:imageUrl="@{imMessage.fromAuthorImg}" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_message_time"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="56dp"
+            android:layout_marginTop="15dp"
+            android:layout_toRightOf="@id/iv_left"
+            android:background="@drawable/left_talker_bg">
+
+            <include
+                android:id="@+id/im_content_include_left"
+                layout="@layout/view_componnent_im_include"
+                bind:imMessage="@{imMessage}"></include>
+            <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="left|center_vertical"-->
+            <!--android:lineSpacingExtra="6dp"-->
+            <!--android:minHeight="40dp"-->
+            <!--android:paddingBottom="9dp"-->
+            <!--android:paddingLeft="15dp"-->
+            <!--android:paddingRight="15dp"-->
+            <!--android:paddingTop="9dp"-->
+            <!--android:text="@{MsgContentResolve.resolve(imMessage.getContentType(),imMessage.getContent())}"-->
+            <!--android:textSize="16dp"-->
+            <!--tool:text="dfsfdsafsafasfdasdfasdfasdfasdfasdfasdfasdfsdfsafasfdasdfdsfsfdssaff"-->
+            <!--/>-->
+        </FrameLayout>
+
+
+    </RelativeLayout>
+</layout>

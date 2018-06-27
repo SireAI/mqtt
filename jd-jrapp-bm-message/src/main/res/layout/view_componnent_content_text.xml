@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools">
+
+    <data>
+        <import type="com.jd.im.converter.MsgContentResolve" />
+
+        <variable
+            name="imMessage"
+            type="com.jd.jrapp.bm.message.db.IMMessage" />
+        <variable
+            name="side"
+            type="Integer"/>
+    </data>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="left|center_vertical"
+        android:lineSpacingExtra="6dp"
+        android:minHeight="40dp"
+        android:paddingBottom="9dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:paddingTop="9dp"
+        android:textColor="@{side == 0 ? @color/im_talker_left_text:@color/im_talker_right_text}"
+        android:text="@{MsgContentResolve.resolve(imMessage.getContentType(),imMessage.getContent())}"
+        android:textSize="16dp"
+        tool:text="遇见便是是缘分，做程序员几年了？" />
+</layout>

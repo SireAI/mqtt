@@ -2,7 +2,6 @@ package com.jd.jrapp.bm.message.adapter.delegate;
 
 import android.view.View;
 
-import com.jd.im.converter.MsgContentResolve;
 import com.jd.jrapp.bm.message.BR;
 import com.jd.jrapp.bm.message.R;
 import com.jd.jrapp.bm.message.adapter.Element;
@@ -10,10 +9,19 @@ import com.jd.jrapp.bm.message.constant.Constant;
 import com.jd.jrapp.bm.message.db.IMMessage;
 import com.jd.jrapp.bm.message.model.IMMessageModel;
 
-public class RightTalkerDelegate extends IMDelegate {
+public class RightTalkerDelegate extends ItemViewDataBindingDelegate<Element> {
+    private final int layoutId;
+    private final IMMessageModel imMessageModel;
 
     public RightTalkerDelegate(IMMessageModel imMessageModel, int layoutId) {
-        super(imMessageModel,layoutId);
+        this.imMessageModel = imMessageModel;
+        this.layoutId = layoutId;
+    }
+
+
+    @Override
+    public int getType() {
+        return layoutId;
     }
 
     @Override
@@ -41,10 +49,15 @@ public class RightTalkerDelegate extends IMDelegate {
     public boolean isForViewType(Element item, int position) {
         if (item != null && item instanceof IMMessage) {
             IMMessage message = (IMMessage) item;
-            if (MsgContentResolve.TEXT_PLAIN.equals(message.getContentType()) && imMessageModel.getUserId().equals(message.getFromAuthorId())) {
+            if (imMessageModel.getUserId().equals(message.getFromAuthorId())) {
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    protected int getItemBRName() {
+        return BR.imMessage;
     }
 }
