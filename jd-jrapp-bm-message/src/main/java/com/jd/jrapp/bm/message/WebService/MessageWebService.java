@@ -1,10 +1,12 @@
 package com.jd.jrapp.bm.message.WebService;
 
 
+import com.jd.jrapp.bm.message.bean.UploadResult;
+
 import okhttp3.RequestBody;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
-import retrofit2.http.Url;
 
 /**
  * ==================================================
@@ -14,8 +16,12 @@ import retrofit2.http.Url;
  * Description:
  * ==================================================
  */
-public interface MessagePushWebService {
-
-    @POST()
-    LiveData<Response<JsonResponse<User>>> uploadFile(@Url String fileUrl , @Body RequestBody Body);
+public interface MessageWebService {
+    /**
+     * 上传文件
+     * @param Body  数据体
+     * @return
+     */
+    @POST("upload/na/")
+    Call<UploadResult> uploadFile(@Body RequestBody Body);
 }

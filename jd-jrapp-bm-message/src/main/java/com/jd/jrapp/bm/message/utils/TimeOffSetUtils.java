@@ -1,4 +1,4 @@
-package com.sire.corelibrary.Utils;
+package com.jd.jrapp.bm.message.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

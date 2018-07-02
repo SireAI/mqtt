@@ -3,24 +3,45 @@
     xmlns:bind="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="com.jd.im.converter.MsgContentResolve"/>
+        <import type="android.view.View" />
 
         <variable
             name="imMessage"
             type="com.jd.jrapp.bm.message.db.IMMessage" />
+        <variable
+            name="eventDelegate"
+            type="com.jd.jrapp.bm.message.adapter.delegate.EventDelegate"/>
+        <variable
+            name="side"
+            type="Integer"/>
+        <variable
+            name="uploadState"
+            type="com.jd.jrapp.bm.message.Manager.UploadState"/>
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:onClick="@{(v)->eventDelegate.onClick(v,imMessage)}"
+     >
 
         <include
-            android:id="@+id/im_content_text_left"
-            layout="@layout/left_text"
-            bind:imMessage="@{imMessage}"></include>
+            android:id="@+id/im_content_text"
+            layout="@layout/view_componnent_content_text"
+            android:visibility="@{MsgContentResolve.isText(imMessage.getContentType())?View.VISIBLE:View.GONE}"
+            bind:imMessage="@{MsgContentResolve.isText(imMessage.getContentType())?imMessage:null}"
+            bind:side="@{MsgContentResolve.isText(imMessage.getContentType())?side:null}"
+            />
 
         <include
-            android:id="@+id/im_content_text_right"
-            layout="@layout/right_text"
-            bind:imMessage="@{imMessage}"></include>
-    </LinearLayout>
+            android:id="@+id/im_content_image"
+            layout="@layout/view_componnent_content_image"
+            android:visibility="@{MsgContentResolve.isImage(imMessage.getContentType())?View.VISIBLE:View.GONE}"
+            bind:imMessage="@{MsgContentResolve.isImage(imMessage.getContentType()) ? imMessage : null}"
+            bind:side="@{MsgContentResolve.isImage(imMessage.getContentType()) ? side : null}"
+            bind:uploadState="@{MsgContentResolve.isImage(imMessage.getContentType())?uploadState:null}"
+            />
+    </FrameLayout>
 </layout>

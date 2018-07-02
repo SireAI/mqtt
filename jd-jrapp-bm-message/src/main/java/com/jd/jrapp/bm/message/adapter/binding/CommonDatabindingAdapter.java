@@ -1,4 +1,4 @@
-package com.jd.jrapp.bm.message.adapter;
+package com.jd.jrapp.bm.message.adapter.binding;
 
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
@@ -9,10 +9,13 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.jd.jrapp.bm.message.R;
 
+
+import java.io.File;
 
 import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
@@ -26,11 +29,11 @@ import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOption
  */
 
 public class CommonDatabindingAdapter {
-    @BindingAdapter({"android:imageUrl", "android:cirlce"})
+    @BindingAdapter(value = {"android:imageUrl", "android:cirlce"})
     public static void loadImage(ImageView view, String url, boolean circle) {
         if (circle) {
             Glide.with(view.getContext()).asBitmap()
-                    .load(url)
+                    .load(getUrl(url))
                     .into(new BitmapImageViewTarget(view) {
                         @Override
                         protected void setResource(Bitmap resource) {
@@ -44,12 +47,26 @@ public class CommonDatabindingAdapter {
                         }
                     });
         } else {
+            System.out.println("false========"+getUrl(url));
+
             Glide.with(view.getContext())
-                    .load(url)
-                    .transition(withCrossFade())
+                    .load(getUrl(url))
                     .into(view);
         }
 
+    }
+
+    private static Object getUrl(String url) {
+        Object mode = null ;
+        if(url == null){
+            return mode;
+        }
+        if(url.startsWith("http")){
+            mode = url;
+        }else {
+            mode = new File(url);
+        }
+        return mode;
     }
 
 }

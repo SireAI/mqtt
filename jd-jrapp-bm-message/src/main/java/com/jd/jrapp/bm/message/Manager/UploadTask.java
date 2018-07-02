@@ -1,21 +1,32 @@
-package com.jd.jrapp.bm.message.configure;
+package com.jd.jrapp.bm.message.Manager;
 
-import static com.jd.jrapp.bm.message.configure.UploadState.UPLOADING;
+import com.jd.jrapp.bm.message.db.IMMessage;
+
+import static com.jd.jrapp.bm.message.Manager.UploadState.UPLOADING;
 
 public class UploadTask {
-    private UploadState uploadState;
+    private final String taskId;
+    private IMMessage uploadMsgInfor;
     private UploadInfor uploadInfor;
 
-    public UploadTask() {
-        uploadState = new UploadState(0,UPLOADING);
+    public UploadTask(String taskId) {
+        this.taskId = taskId;
     }
 
     public UploadState getUploadState() {
-        return uploadState;
+        return uploadInfor.getUploadState();
     }
 
-    public void setUploadState(UploadState uploadState) {
-        this.uploadState = uploadState;
+    public IMMessage getUploadMsgInfor() {
+        return uploadMsgInfor;
+    }
+
+    public void setUploadMsgInfor(IMMessage uploadMsgInfor) {
+        this.uploadMsgInfor = uploadMsgInfor;
+    }
+
+    public String getTaskId(){
+        return taskId;
     }
 
     public UploadInfor getUploadInfor() {

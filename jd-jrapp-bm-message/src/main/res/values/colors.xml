@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="im_message_bg">
-        #EBEBEB
+        #F5F5F5
     </color>
-
+    <!--白色背景提示性文字26%-->
+    <color name="white_bg_3_text">
+        #BCBCBC
+    </color>
+    <color name="main_bg">
+        #FAFAFA
+    </color>
+    <color name="white_bg_1_text">#212121</color>
+    <color name="im_title">#666666</color>
+    <color name="im_talker_left_text">#333333</color>
+    <color name="im_talker_right_text">#ffffff</color>
 </resources>

@@ -1,7 +1,6 @@
-package com.sire.corelibrary.Utils;
+package com.jd.jrapp.bm.message.utils;
 
 import android.text.TextUtils;
-import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -19,6 +18,44 @@ import java.util.Locale;
 
 public class TimeConverterUtils {
     public static String date2SimpleDescription(Date date) {
+        Date currentDate = new Date();
+        long deltaTime = currentDate.getTime() - date.getTime();
+        //秒
+        deltaTime = deltaTime / 1000;
+        if (deltaTime <= 30) {
+            return "刚刚";
+        }
+        if (deltaTime <= 60) {
+            return deltaTime + "秒前";
+        }
+        //分钟
+        deltaTime = deltaTime / 60;
+        if (deltaTime >= 1 && deltaTime <= 60) {
+            return deltaTime + "分钟前";
+        }
+        //小时
+        deltaTime = deltaTime / 60;
+        if (deltaTime >= 1 && deltaTime <= 24) {
+            if (isNow(date) && deltaTime >= 6) {
+                String dateDescription = getOneDayDescription(date);
+                if (dateDescription != null) {
+                    return dateDescription;
+                }
+            }
+            return deltaTime + "小时前";
+        }
+        //天
+        deltaTime = deltaTime / 24;
+        if (deltaTime >= 1 && deltaTime <= 3) {
+            if (deltaTime == 1) {
+                return "昨天";
+            }
+            return deltaTime + "天前";
+        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
+        return simpleDateFormat.format(date);
+    }
+    public static String date2SimpleDescriptionMankind(Date date) {
         Date currentDate = new Date();
         long deltaTime = currentDate.getTime() - date.getTime();
         //秒

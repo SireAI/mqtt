@@ -1,0 +1,10 @@
+syntax = "proto3";
+package com.jd.im.message;
+
+
+//消息内容
+message SendMessageReport{
+    uint64 receivedMsgId = 1;            // 接收的消息编号
+}
+
+

@@ -6,19 +6,25 @@
 
         <import type="com.jd.jrapp.bm.message.utils.TimeConverterUtils" />
 
-        <variable
-            name="delegate"
-            type="com.jd.jrapp.bm.message.adapter.delegate.RightTalkerTextDelegate" />
-
         <import type="com.jd.jrapp.bm.message.adapter.delegate.MessageFailedExtroInfor"></import>
 
+        <import type="com.jd.im.converter.MsgContentResolve" />
+
         <import type="android.view.View" />
+
+        <variable
+            name="delegate"
+            type="com.jd.jrapp.bm.message.adapter.delegate.EventDelegate" />
+
 
         <variable
             name="imMessage"
             type="com.jd.jrapp.bm.message.db.IMMessage" />
 
-        <import type="com.jd.im.converter.MsgContentResolve" />
+        <variable
+            name="uploadState"
+            type="com.jd.jrapp.bm.message.Manager.UploadState"/>
+
     </data>
 
     <RelativeLayout
@@ -82,21 +88,10 @@
                 <include
                     android:id="@+id/im_content_include_right"
                     layout="@layout/view_componnent_im_include"
-                    bind:imMessage="@{imMessage}"></include>
-                <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:gravity="left|center_vertical"-->
-                <!--android:lineSpacingExtra="6dp"-->
-                <!--android:minHeight="40dp"-->
-                <!--android:paddingBottom="9dp"-->
-                <!--android:paddingLeft="15dp"-->
-                <!--android:paddingRight="15dp"-->
-                <!--android:paddingTop="9dp"-->
-                <!--android:text="@{MsgContentResolve.resolve(imMessage.getContentType(),imMessage.getContent())}"-->
-                <!--android:textColor="@android:color/white"-->
-                <!--android:textSize="16dp"-->
-                <!--tool:text="asfasfsadsafasdfsafsafsafasdfasdfadsfasfsa" />-->
+                    bind:eventDelegate="@{delegate}"
+                    bind:imMessage="@{imMessage}"
+                    bind:uploadState="@{uploadState}"
+                    bind:side="@{2}" />
             </FrameLayout>
         </LinearLayout>
 

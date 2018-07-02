@@ -1,4 +1,4 @@
-package com.jd.jrapp.bm.message.adapter;
+package com.jd.jrapp.bm.message.adapter.delegate;
 
 import android.support.v4.util.SparseArrayCompat;
 

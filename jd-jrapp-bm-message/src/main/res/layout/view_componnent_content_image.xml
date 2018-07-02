@@ -1,26 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tool="http://schemas.android.com/tools">
 
     <data>
 
         <import type="com.jd.im.converter.MsgContentResolve" />
+        <import type="android.view.View" />
 
         <variable
             name="imMessage"
             type="com.jd.jrapp.bm.message.db.IMMessage" />
+
+        <variable
+            name="side"
+            type="Integer" />
+        <variable
+            name="uploadState"
+            type="com.jd.jrapp.bm.message.Manager.UploadState"/>
     </data>
 
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <ImageView
+
+        <com.jd.jrapp.bm.message.widget.CornerImageView
             android:layout_width="131dp"
             android:layout_height="144dp"
             android:scaleType="fitXY"
-            tool:src="@mipmap/jd_jrapp_bm_message_me" />
-        <View
-            android:layout_width="131dp"
-            android:layout_height="144dp"></View>
+            app:corner_left_bottom="@dimen/im_big_corner"
+            android:imageUrl="@{imMessage.contentObj.imageUrl}"
+            android:cirlce="@{false}"
+            app:corner_letf_top="@{side == 1 ? @dimen/im_small_corner : @dimen/im_big_corner}"
+            app:corner_right_bottom="@{side == 1 ? @dimen/im_big_corner : @dimen/im_small_corner}"
+            app:corner_right_top="@dimen/im_big_corner" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{uploadState.state == 1 ? View.VISIBLE:View.GONE}"
+            >
+
+            <View
+                android:layout_width="131dp"
+                android:layout_height="144dp"
+                android:alpha="0.5"
+                android:background="@{side == 1 ? @drawable/shape_image_loading_left:@drawable/shape_image_loading_right}" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:indeterminateDrawable="@drawable/loading_progress" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text='@{uploadState.progress+"%"}'
+                    android:textColor="@android:color/white"
+                    android:textSize="13dp"
+                    tool:text="99%" />
+            </LinearLayout>
+        </RelativeLayout>
     </FrameLayout>
 </layout>

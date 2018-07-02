@@ -1,4 +1,6 @@
 package com.jd.jrapp.bm.message.adapter;
 
-public class Element {
+public interface Element {
+    String diffId();
+    String diffContent();
 }

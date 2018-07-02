@@ -7,6 +7,9 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+
+import com.jd.jrapp.bm.message.Manager.UploadState;
+
 import java.util.Date;
 import java.util.List;
 
@@ -24,10 +27,16 @@ public interface MessageDao {
     void saveIMMessage(IMMessage... messages);
     @Query("SELECT * FROM IMMessage WHERE messageCreateTime < :timeLine AND ((fromAuthorId = :fromAuthorId AND toAuthorId = :toAuthorId) OR (fromAuthorId = :toAuthorId AND toAuthorId = :fromAuthorId)) ORDER BY messageCreateTime DESC LIMIT :pageSize")
     LiveData<List<IMMessage>> queryIMMessagesByTimeLine(String fromAuthorId,String toAuthorId, Long timeLine, int pageSize);
-    @Query("SELECT COUNT(*) FROM IMMessage WHERE fromAuthorId = :fromAuthorId  AND  read = 0")
+    @Query("SELECT COUNT(*) FROM IMMessage WHERE fromAuthorId = :fromAuthorId ")
     LiveData<Integer> queryIMMessagesCount(String fromAuthorId);
     @Update(onConflict = OnConflictStrategy.REPLACE)
     void updateIMMessage(IMMessage item);
     @Query("SELECT MAX(messageCreateTime) FROM IMMessage")
     Date findLatestIMMessageTime();
+    @Query("SELECT * FROM IMMessage WHERE transportState = 1 AND contentType IN (:uploadMessages)")
+    LiveData<List<IMMessage>> queryUploadMessage(String[] uploadMessages);
+    @Query("SELECT * FROM IMMessage WHERE messageId = :messageId")
+    IMMessage queryByMessageId(String messageId);
+    @Query("SELECT * FROM IMMessage WHERE messageId = :messageId")
+    IMMessage queryIMMessagesById(String messageId);
 }

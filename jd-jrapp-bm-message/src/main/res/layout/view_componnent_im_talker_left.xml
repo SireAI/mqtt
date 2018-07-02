@@ -16,8 +16,11 @@
 
         <variable
             name="delegate"
-            type="com.jd.jrapp.bm.message.adapter.delegate.RightTalkerTextDelegate" />
+            type="com.jd.jrapp.bm.message.adapter.delegate.EventDelegate" />
 
+        <variable
+            name="uploadState"
+            type="com.jd.jrapp.bm.message.Manager.UploadState"/>
     </data>
 
     <RelativeLayout
@@ -65,21 +68,9 @@
             <include
                 android:id="@+id/im_content_include_left"
                 layout="@layout/view_componnent_im_include"
-                bind:imMessage="@{imMessage}"></include>
-            <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:gravity="left|center_vertical"-->
-            <!--android:lineSpacingExtra="6dp"-->
-            <!--android:minHeight="40dp"-->
-            <!--android:paddingBottom="9dp"-->
-            <!--android:paddingLeft="15dp"-->
-            <!--android:paddingRight="15dp"-->
-            <!--android:paddingTop="9dp"-->
-            <!--android:text="@{MsgContentResolve.resolve(imMessage.getContentType(),imMessage.getContent())}"-->
-            <!--android:textSize="16dp"-->
-            <!--tool:text="dfsfdsafsafasfdasdfasdfasdfasdfasdfasdfasdfsdfsafasfdasdfdsfsfdssaff"-->
-            <!--/>-->
+                bind:eventDelegate="@{delegate}"
+                bind:imMessage="@{imMessage}"
+                bind:side="@{1}"/>
         </FrameLayout>
 
 

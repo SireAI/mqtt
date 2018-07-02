@@ -3,12 +3,17 @@
 buildscript {
     
     repositories {
+
+//        maven { url  "https://dl.bintray.com/jdfinance/sire-maven" }
+//        maven{ url 'http://nexus.cbpmgt.com/nexus/content/groups/public' }
+//        maven{ url 'http://nexus.cbpmgt.com/nexus/content/repositories/snapshots' }
         google()
-        jcenter()
+                jcenter()
+
         maven {
             url "https://plugins.gradle.org/m2/"
         }
-        maven { url  "https://dl.bintray.com/jdfinance/sire-maven" }
+
 
     }
     dependencies {
@@ -24,9 +29,12 @@ buildscript {
 
 allprojects {
     repositories {
+//        maven { url  "https://dl.bintray.com/jdfinance/sire-maven" }
+//        maven{ url 'http://nexus.cbpmgt.com/nexus/content/groups/public' }
+//        maven{ url 'http://nexus.cbpmgt.com/nexus/content/repositories/snapshots' }
         google()
-        jcenter()
-        maven { url  "https://dl.bintray.com/jdfinance/sire-maven" }
+                jcenter()
+
 
     }
 }

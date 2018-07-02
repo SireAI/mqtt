@@ -1,4 +1,4 @@
-package com.jd.jrapp.bm.message.adapter;
+package com.jd.jrapp.bm.message.adapter.delegate;
 
 
 /**

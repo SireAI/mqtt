@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-</selector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners
+        android:bottomLeftRadius="@dimen/im_big_corner"
+        android:bottomRightRadius="@dimen/im_small_corner"
+        android:topLeftRadius="@dimen/im_big_corner"
+        android:topRightRadius="@dimen/im_big_corner"></corners>
+    <solid android:color="#4D7BFE"></solid>
+    <size android:height="40dp" android:width="46dp"></size>
+</shape>

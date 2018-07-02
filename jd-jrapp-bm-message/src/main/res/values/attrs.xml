@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <!--CornerImageView 属性-->
+    <declare-styleable name="CornerImageView">
+        <attr name="corner_letf_top" format="dimension" />
+        <attr name="corner_right_top" format="dimension" />
+        <attr name="corner_right_bottom" format="dimension" />
+        <attr name="corner_left_bottom" format="dimension" />
+    </declare-styleable>
+</resources>

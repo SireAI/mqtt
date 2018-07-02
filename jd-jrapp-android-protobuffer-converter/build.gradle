@@ -1,0 +1,59 @@
+plugins {
+    id "com.google.protobuf" version "0.8.5"
+}
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            proto {
+                srcDir "src/main/proto"
+            }
+            java {
+                srcDir 'src/main/java'
+            }
+
+            res {
+                srcDir 'src/main/res'
+            }
+        }
+    }
+
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.5.1'
+    }
+    generateProtoTasks {
+        all()*.builtins {
+            javanano { }
+        }
+    }
+
+}
+
+
+dependencies {
+    api 'com.google.protobuf.nano:protobuf-javanano:3.2.0rc2'
+
+    implementation project(':jd-jrapp-android-basic-communication')
+//    implementation 'com.sire:jd-im:1.0.1'
+}
+
+//apply from: '../publish.gradle'

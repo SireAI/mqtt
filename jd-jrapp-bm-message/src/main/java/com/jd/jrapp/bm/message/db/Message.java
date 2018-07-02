@@ -1,9 +1,7 @@
 package com.jd.jrapp.bm.message.db;
 
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.databinding.ObservableBoolean;
 import android.support.annotation.NonNull;
 
 
@@ -15,13 +13,7 @@ import java.util.Date;
  * All Right Reserved
  * Date:2018/01/24
  * Author:Sire
- * Description:
- * string uuid = 1;        // 消息编号 不能重复
- string fromUri = 2;            // 消息来源uri
- string fromEpid = 3;            // 消息来源epid
- string fromNickname = 4;           // 发送者
- string contentType = 5;           // 消息类型
- bytes contentBuffer = 6;            // 消息内容
+ * Description:  原类型消息
  * ==================================================
  */
 @Entity
@@ -39,7 +31,7 @@ public class Message {
     private boolean read = false;
 
     /**
-     * 消息接收方用户id，用于消息区分加载
+     * 消息接收方用户id，用于消息区分存储加载删除等操作
      */
     private String userId;
     /**
@@ -52,19 +44,53 @@ public class Message {
      */
     private Date messageCreateTime;
 
+    /**
+     * 消息来源
+     */
+    private String fromUri;
+    /**
+     * 消息来源epid
+     */
+    private String fromEpid;
 
     /**
-     * 消息数据
+     *设备标识
      */
-    private String jsonData;
+    private String fromDeviceId;
 
     /**
-     * 消息数据
+     * 发送者昵称
      */
-    @Ignore
-    private Object data;
-    @Ignore
-    private ObservableBoolean messageRead = new ObservableBoolean(false);
+    private String fromNickname;
+    /**
+     * 消息内容
+     */
+    private String content;
+
+    @NonNull
+    public String getMessageId() {
+        return messageId;
+    }
+
+    public void setMessageId(@NonNull String messageId) {
+        this.messageId = messageId;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public int getMessageType() {
         return messageType;
@@ -82,66 +108,58 @@ public class Message {
         this.messageCreateTime = messageCreateTime;
     }
 
-    public ObservableBoolean getMessageRead() {
-        return messageRead;
+    public String getFromUri() {
+        return fromUri;
     }
 
-    public void setMessageRead(ObservableBoolean messageRead) {
-        this.messageRead = messageRead;
+    public void setFromUri(String fromUri) {
+        this.fromUri = fromUri;
     }
 
-    public String getMessageId() {
-        return messageId;
+    public String getFromEpid() {
+        return fromEpid;
     }
 
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
+    public void setFromEpid(String fromEpid) {
+        this.fromEpid = fromEpid;
     }
 
-    public String getJsonData() {
-        return jsonData;
+    public String getFromNickname() {
+        return fromNickname;
     }
 
-    public void setJsonData(String jsonData) {
-        this.jsonData = jsonData;
+    public void setFromNickname(String fromNickname) {
+        this.fromNickname = fromNickname;
     }
 
-    public boolean isRead() {
-        return read;
+    public String getContent() {
+        return content;
     }
 
-    public void setRead(boolean read) {
-        this.read = read;
-        messageRead.set(read);
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public Object getData() {
-        return data;
+    public String getFromDeviceId() {
+        return fromDeviceId;
     }
 
-    public void setData(Object data) {
-        this.data = data;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setFromDeviceId(String fromDeviceId) {
+        this.fromDeviceId = fromDeviceId;
     }
 
     @Override
     public String toString() {
         return "Message{" +
-                "read=" + read +
-                ", messageId='" + messageId + '\'' +
+                "messageId='" + messageId + '\'' +
+                ", read=" + read +
                 ", userId='" + userId + '\'' +
                 ", messageType=" + messageType +
                 ", messageCreateTime=" + messageCreateTime +
-                ", jsonData='" + jsonData + '\'' +
-                ", data=" + data +
-                ", messageRead=" + messageRead +
+                ", fromUri='" + fromUri + '\'' +
+                ", fromEpid='" + fromEpid + '\'' +
+                ", fromNickname='" + fromNickname + '\'' +
+                ", content='" + content + '\'' +
                 '}';
     }
 }

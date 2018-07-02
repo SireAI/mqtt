@@ -1,9 +1,14 @@
 package com.jd.jrapp.bm.message.db;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.support.annotation.NonNull;
 
 
+import com.jd.jrapp.bm.message.adapter.Element;
+import com.jd.jrapp.bm.message.bean.content.IMultiContent;
+import com.jd.jrapp.bm.message.constant.Constant;
 
 import java.util.Date;
 
@@ -15,8 +20,8 @@ import java.util.Date;
  * Description:存储IM消息对话数据
  * ==================================================
  */
-@Entity(primaryKeys = "messageId")
-public class IMMessage {
+@Entity(primaryKeys = {"messageId"},indices = {@Index(name = "from_to_id",value = {"fromAuthorId","toAuthorId"})})
+public class IMMessage implements Element {
     @NonNull
     private String messageId;
     /**
@@ -33,6 +38,12 @@ public class IMMessage {
      * 发表的用户id
      */
     private String fromAuthorId;
+
+    /**
+     *设备标识
+     */
+    private String fromDeviceId;
+
     /**
      * 接受用户的id
      */
@@ -49,20 +60,38 @@ public class IMMessage {
     /**
      * 发表头像
      */
+    @Ignore
     private String fromAuthorImg;
     /**
      * 接受用户头像
      */
+    @Ignore
     private String toAuthorImg;
+    /**
+     * 内容对象
+     */
+    @Ignore
+    private IMultiContent contentObj;
     /**
      * 消息创建时间
      */
     private Date messageCreateTime;
 
+    private String failedInfor;
+
+    private String contentType;
+
+
+    /**
+     * 消息发送状态
+     */
+    private int transportState = Constant.T_SENDING;
+
+
     /**
      * 内容
      */
-    private String content;
+    private byte[] content;
 
     public String getMessageId() {
         return messageId;
@@ -78,6 +107,14 @@ public class IMMessage {
 
     public void setRead(boolean read) {
         this.read = read;
+    }
+
+    public String getFailedInfor() {
+        return failedInfor;
+    }
+
+    public void setFailedInfor(String failedInfor) {
+        this.failedInfor = failedInfor;
     }
 
     public String getFromAuthorId() {
@@ -136,11 +173,21 @@ public class IMMessage {
         this.messageCreateTime = messageCreateTime;
     }
 
-    public String getContent() {
+    @Override
+    public String diffId() {
+        return getMessageId();
+    }
+
+    @Override
+    public String diffContent() {
+        return toString();
+    }
+
+    public byte[] getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(byte[] content) {
         this.content = content;
     }
 
@@ -166,6 +213,8 @@ public class IMMessage {
         return null;
     }
 
+
+
     /**
      * 获取对话者名字
      * @return
@@ -180,6 +229,14 @@ public class IMMessage {
         return null;
     }
 
+    public String getFromDeviceId() {
+        return fromDeviceId;
+    }
+
+    public void setFromDeviceId(String fromDeviceId) {
+        this.fromDeviceId = fromDeviceId;
+    }
+
     @Override
     public String toString() {
         return "IMMessage{" +
@@ -187,12 +244,15 @@ public class IMMessage {
                 ", read=" + read +
                 ", showTime=" + showTime +
                 ", fromAuthorId='" + fromAuthorId + '\'' +
+                ", fromDeviceId='" + fromDeviceId + '\'' +
                 ", toAuthorId='" + toAuthorId + '\'' +
                 ", fromAuthorName='" + fromAuthorName + '\'' +
                 ", toAuthorName='" + toAuthorName + '\'' +
                 ", fromAuthorImg='" + fromAuthorImg + '\'' +
                 ", toAuthorImg='" + toAuthorImg + '\'' +
                 ", messageCreateTime=" + messageCreateTime +
+                ", failedInfor='" + failedInfor + '\'' +
+                ", transportState=" + transportState +
                 ", content='" + content + '\'' +
                 '}';
     }
@@ -214,4 +274,28 @@ public class IMMessage {
         return (fromAuthorId != null ? fromAuthorId.equals(imMessage.fromAuthorId) : imMessage.fromAuthorId == null) && (toAuthorId != null ? toAuthorId.equals(imMessage.toAuthorId) : imMessage.toAuthorId == null);
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public int getTransportState() {
+        return transportState;
+    }
+
+    public void setTransportState(int transportState) {
+
+        this.transportState = transportState;
+    }
+
+    public IMultiContent getContentObj() {
+        return contentObj;
+    }
+
+    public void setContentObj(IMultiContent contentObj) {
+        this.contentObj = contentObj;
+    }
 }

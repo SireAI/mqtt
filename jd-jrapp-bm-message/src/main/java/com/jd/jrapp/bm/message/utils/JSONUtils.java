@@ -1,12 +1,14 @@
-package com.sire.corelibrary.Utils;
+package com.jd.jrapp.bm.message.utils;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +30,8 @@ public class JSONUtils {
     private static void checkInstance() {
         if (mapper == null) {
             mapper = new ObjectMapper();
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
         }
     }
 
@@ -66,8 +70,10 @@ public class JSONUtils {
             return null;
         }
         try {
-
-            return mapper.readValue(jsonString,clazz);
+           return mapper.readValue(jsonString,clazz);
+//            JavaType javaType = mapper.getTypeFactory().constructType(clazz);
+//            ObjectReader reader = mapper.readerFor(javaType);
+//            return reader.readValue(jsonString);
         } catch (JsonParseException e) {
             e.printStackTrace();
         } catch (JsonMappingException e) {
@@ -110,8 +116,10 @@ public class JSONUtils {
 
     public static String bean2JsonString(Object src) {
         checkInstance();
+        JavaType javaType = mapper.getTypeFactory().constructType(src.getClass());
+        ObjectWriter writer = mapper.writerFor(javaType);
         try {
-            return mapper.writeValueAsString(src);
+            return writer.writeValueAsString(src);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

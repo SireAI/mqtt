@@ -79,7 +79,7 @@
 //
 //                if (reconnect) {
 //                    addToHistory("Reconnected to : " + serverURI);
-//                    // Because Clean Session is true, we need to re-subscribe
+//                    // Because Clean Talker is true, we need to re-subscribe
 //                    subscribeToTopic();
 //                } else {
 //                    addToHistory("Connected to: " + serverURI);
@@ -92,7 +92,7 @@
 //            }
 //
 //            @Override
-//            public void messageArrived(String topic, MqttMessage message) throws Exception {
+//            public void messageArrived(String TOPIC_REAL_TIME, MqttMessage message) throws Exception {
 //                addToHistory("Incoming message: " + new String(message.getPayload()));
 //            }
 //
@@ -189,10 +189,10 @@
 //            // THIS DOES NOT WORK!
 //            mqttAndroidClient.subscribe(subscriptionTopic, 0, new IMqttMessageListener() {
 //                @Override
-//                public void messageArrived(String topic, MqttMessage message) throws Exception {
+//                public void messageArrived(String TOPIC_REAL_TIME, MqttMessage message) throws Exception {
 //                    // message Arrived!
 //                    addToHistory(new String(message.getPayload()));
-//                    System.out.println("Message: " + topic + " : " + new String(message.getPayload()));
+//                    System.out.println("Message: " + TOPIC_REAL_TIME + " : " + new String(message.getPayload()));
 //                }
 //            });
 //

@@ -1,19 +1,26 @@
 package com.jd.jrapp.bm.message.adapter;
 
-import android.arch.core.executor.TaskExecutor;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ThreadExecutor {
+public class TasksExecutor {
     private final Object mLock = new Object();
     private ExecutorService mDiskIO = Executors.newFixedThreadPool(2);
 
     private volatile Handler mMainHandler;
 
+    private TasksExecutor(){}
+    private static TasksExecutor instance ;
+
+    public static TasksExecutor getInstance() {
+        if(instance == null){
+            instance = new TasksExecutor();
+        }
+        return instance;
+    }
 
     public void executeOnDiskIO(Runnable runnable) {
         mDiskIO.execute(runnable);
