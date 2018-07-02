@@ -3,57 +3,108 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 27
 
+    buildToolsVersion "27.0.3"
 
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 27
+        minSdkVersion 14
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
     dataBinding {
         enabled = true
     }
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 
 }
+//configurations.all {
+//    resolutionStrategy {
+//        force "com.android.support:support-annotations:23.2.1"
+//        force "com.android.support:support-core-utils:24.2.0"
+//        force "com.android.support:support-v4:24.2.0"
+////        force "com.android.support:support-compat:27.0.1"
+//        force "com.android.support:support-fragment:24.2.0"
+//    }
+//}
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
-
+//    configurations {
+//        all*.exclude group: 'com.android.support'
+//    }
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:recyclerview-v7:27.0.1'
+//    implementation 'com.android.support:recyclerview-v7:23.2.1'
+//    implementation ('android.arch.lifecycle:runtime:1.0.3'){
+//
+//    }
+    compile 'com.android.support:appcompat-v7:27.0.1'
+//    compile('com.android.support:appcompat-v7:23.2.1', {
+//        exclude group: 'com.android.support', module: 'design'
+//    })
+//    compile('com.android.support:recyclerview-v7:23.2.1', {
+//        exclude group: 'com.android.support', module: 'design'
+//    })
     def lifecycle_version = "1.1.1"
+//    def lifecycle_version = "1.0.3"
 
     // ViewModel and LiveData
-    api "android.arch.lifecycle:extensions:$lifecycle_version"
+    compile "android.arch.lifecycle:extensions:$lifecycle_version"
 
-    implementation "com.android.support:support-fragment:27.1.1"
+//    compile ("android.arch.lifecycle:extensions:$lifecycle_version"){
+//        exclude group: 'com.android.support'
+//    }
+
     annotationProcessor "android.arch.lifecycle:compiler:$lifecycle_version"
     // alternately - if using Java8, use the following instead of compiler
 //    implementation "android.arch.lifecycle:common-java8:$lifecycle_version"
     def paging_version = "1.0.0"
 
 //    implementation "android.arch.paging:runtime:$paging_version"
-    def room_version = "1.1.0" // or, for latest rc, use "1.1.1-rc1"
+    def room_version = "1.1.1" // or, for latest rc, use "1.1.1-rc1"
+    compile "android.arch.persistence.room:runtime:$room_version"
+//    compile group: 'android.arch.persistence.room', name: 'runtime', version: '1.1.1'
 
-    implementation "android.arch.persistence.room:runtime:$room_version"
+//    compile ("android.arch.persistence.room:runtime:$room_version"){
+//        exclude group: 'com.android.support'
+//
+//    }
     annotationProcessor "android.arch.persistence.room:compiler:$room_version"
-    implementation('com.android.support:design:27.1.1') {
-        exclude group: 'android.arch.lifecycle'
-    }
-    api 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.3'
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
-    implementation 'com.github.bumptech.glide:glide:4.7.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
-    implementation "com.squareup.retrofit2:retrofit:2.3.0"
-    api "com.squareup.retrofit2:converter-jackson:2.3.0"
+//    implementation('com.android.support:design:23.2.1'){
+//        exclude group: 'com.android.support'
+//
+//    }
+//    compile('com.android.databinding:library:2.1.2'){
+//        exclude group: 'com.android.support'
+//
+//    }
+//            {
+//        exclude group: 'android.arch.lifecycle'
+//    }
+    compile ('com.github.bumptech.glide:glide:4.7.1'){
+        exclude group: 'com.android.support'
 
-    implementation project(':jd-jrapp-android-protobuffer-converter')
-    implementation project(':jd-jrapp-android-basic-communication')
+    }
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
+
+    compile "com.squareup.retrofit2:retrofit:2.3.0"
+    compile "com.squareup.retrofit2:converter-jackson:2.3.0"
+
+    compile project(':jd-jrapp-android-protobuffer-converter')
+    compile project(':jd-jrapp-android-basic-communication')
 }

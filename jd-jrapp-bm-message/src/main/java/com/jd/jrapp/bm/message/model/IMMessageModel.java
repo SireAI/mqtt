@@ -6,7 +6,6 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.Transformations;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -15,8 +14,8 @@ import com.jd.im.converter.MsgContentResolve;
 import com.jd.im.message.nano.Ack;
 import com.jd.im.message.nano.ImageMessage;
 import com.jd.im.mqtt.MQTTException;
-import com.jd.jrapp.bm.message.Manager.UploadInfor;
-import com.jd.jrapp.bm.message.Manager.UploadState;
+import com.jd.jrapp.bm.message.manager.UploadInfor;
+import com.jd.jrapp.bm.message.manager.UploadState;
 import com.jd.jrapp.bm.message.bean.content.FileContent;
 import com.jd.jrapp.bm.message.bean.content.IMultiContent;
 import com.jd.jrapp.bm.message.adapter.TasksExecutor;
@@ -31,7 +30,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.List;
 
-import static com.jd.jrapp.bm.message.Manager.UploadState.UPLOADING;
+import static com.jd.jrapp.bm.message.manager.UploadState.UPLOADING;
 import static com.jd.jrapp.bm.message.constant.Constant.FILE_MESSAGE_IMAGE;
 
 

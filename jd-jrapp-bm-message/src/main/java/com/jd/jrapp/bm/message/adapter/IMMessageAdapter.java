@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import com.jd.jrapp.bm.message.adapter.delegate.ItemViewDelegate;
 import com.jd.jrapp.bm.message.adapter.delegate.ItemViewDelegateManager;
 import com.jd.jrapp.bm.message.adapter.delegate.ViewHolder;
-import com.jd.jrapp.bm.message.bean.LoadingInfor;
+
 
 import java.util.List;
 /**

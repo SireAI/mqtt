@@ -20,7 +20,7 @@
 
         <variable
             name="uploadState"
-            type="com.jd.jrapp.bm.message.Manager.UploadState"/>
+            type="com.jd.jrapp.bm.message.manager.UploadState"/>
     </data>
 
     <RelativeLayout

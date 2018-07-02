@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <application>
         <service android:name="com.jd.jrapp.bm.message.service.JDMqttService" />
-        <activity android:name=".controller.IMMessageController" android:theme="@style/BaseTheme"
+        <activity android:name=".controller.IMMessageController"
             >
         </activity>
     </application>

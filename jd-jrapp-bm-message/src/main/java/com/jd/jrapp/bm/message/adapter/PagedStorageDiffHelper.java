@@ -4,7 +4,8 @@ package com.jd.jrapp.bm.message.adapter;
 
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
-import android.support.v7.util.ListUpdateCallback;
+
+im
 
 import java.util.List;
 /**

@@ -5,9 +5,9 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.widget.ImageView;
 
 import com.jd.jrapp.bm.message.R;
 
@@ -20,7 +20,7 @@ import com.jd.jrapp.bm.message.R;
  * Description: 可配置圆角图片
  * =====================================================
  */
-public class CornerImageView extends AppCompatImageView {
+public class CornerImageView extends ImageView {
 
 
     private final int DEFAULT_BORDER_WIDTH = 15;

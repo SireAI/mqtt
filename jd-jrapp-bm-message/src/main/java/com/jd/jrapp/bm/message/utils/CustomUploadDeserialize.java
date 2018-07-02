@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.jd.jrapp.bm.message.Manager.UploadState;
+import com.jd.jrapp.bm.message.manager.UploadState;
 
 import java.io.IOException;
 

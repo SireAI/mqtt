@@ -3,10 +3,12 @@ package com.jd.jrapp.bm.message.adapter;
 import android.arch.core.executor.ArchTaskExecutor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.recyclerview.extensions.AsyncDifferConfig;
+
 import android.support.v7.util.DiffUtil;
 import android.support.v7.util.ListUpdateCallback;
 import android.support.v7.widget.RecyclerView;
+
+
 
 import java.util.List;
 import java.util.concurrent.Executor;

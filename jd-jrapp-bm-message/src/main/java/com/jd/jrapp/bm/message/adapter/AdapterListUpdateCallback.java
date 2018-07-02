@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.util.ListUpdateCallback;
 import android.support.v7.widget.RecyclerView;
 
+
 public final class AdapterListUpdateCallback implements ListUpdateCallback {
     @NonNull
     private final RecyclerView.Adapter mAdapter;

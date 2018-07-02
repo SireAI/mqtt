@@ -2,8 +2,8 @@ package com.jd.jrapp.bm.message.adapter.delegate;
 
 import com.jd.im.converter.MsgContentResolve;
 import com.jd.jrapp.bm.message.BR;
-import com.jd.jrapp.bm.message.Manager.UploadManager;
-import com.jd.jrapp.bm.message.Manager.UploadState;
+import com.jd.jrapp.bm.message.manager.UploadManager;
+import com.jd.jrapp.bm.message.manager.UploadState;
 import com.jd.jrapp.bm.message.adapter.Element;
 import com.jd.jrapp.bm.message.db.IMMessage;
 import com.jd.jrapp.bm.message.model.IMMessageModel;

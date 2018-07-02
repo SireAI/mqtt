@@ -3,9 +3,9 @@ package com.example.im.imdemo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +17,7 @@ import com.jd.im.client.MessageCallBack;
 import com.jd.im.client.MessageResult;
 import com.jd.im.client.MqttClient;
 import com.jd.im.converter.ProtobufferConverterFactory;
+
 import com.jd.im.message.disconnect.nano.DisconnectMessage;
 import com.jd.im.message.nano.Ack;
 import com.jd.im.message.nano.ClientPublishMessage;
@@ -25,16 +26,13 @@ import com.jd.im.mqtt.MQTTException;
 import com.jd.im.mqtt.MQTTVersion;
 import com.jd.im.mqtt.MqttConnectOptions;
 import com.jd.jrapp.bm.message.bean.Talker;
-import com.jd.jrapp.bm.message.Manager.UploadInfor;
-import com.jd.jrapp.bm.message.Manager.UploadManager;
-import com.jd.jrapp.bm.message.Manager.UploadTask;
 import com.jd.jrapp.bm.message.controller.IMMessageController;
 import com.jd.jrapp.bm.message.service.JDMqttService;
 import com.jd.jrapp.bm.message.utils.CommonUtils;
-import com.jd.jrapp.bm.message.utils.UUIDUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+
 
 import paho.mqtt.java.example.R;
 
@@ -43,7 +41,7 @@ import static com.jd.im.message.nano.ClientPublishMessage.CHAT;
 import static com.jd.im.mqtt.MQTTConstants.QOS_1;
 import static com.jd.jrapp.bm.message.constant.Constant.PEER_TALKER;
 
-public class JoyTalkActivity extends AppCompatActivity implements MqttClient.PushCallBack<Object> {
+public class JoyTalkActivity extends FragmentActivity implements MqttClient.PushCallBack<Object> {
     private static final String TAG = "JoyTalkActivity";
     //
     final String serverUri = "tcp://iot.eclipse.org:1883";
@@ -65,10 +63,10 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scrolling);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        android.support.v7.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,7 +74,7 @@ public class JoyTalkActivity extends AppCompatActivity implements MqttClient.Pus
             }
         });
 
-        RecyclerView mRecyclerView = findViewById(R.id.history_recycler_view);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.history_recycler_view);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 

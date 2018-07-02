@@ -17,14 +17,13 @@
             type="Integer"/>
         <variable
             name="uploadState"
-            type="com.jd.jrapp.bm.message.Manager.UploadState"/>
+            type="com.jd.jrapp.bm.message.manager.UploadState"/>
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
-        android:onClick="@{(v)->eventDelegate.onClick(v,imMessage)}"
      >
 
         <include

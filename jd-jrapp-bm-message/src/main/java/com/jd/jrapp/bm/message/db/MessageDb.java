@@ -6,10 +6,7 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
-
-import com.jd.jrapp.bm.message.Manager.UploadState;
 
 import java.util.Date;
 import java.util.UUID;

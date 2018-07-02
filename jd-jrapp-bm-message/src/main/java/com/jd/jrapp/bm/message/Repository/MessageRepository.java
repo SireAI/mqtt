@@ -3,10 +3,6 @@ package com.jd.jrapp.bm.message.repository;
 
 import android.arch.lifecycle.LiveData;
 
-import com.google.protobuf.nano.MessageNano;
-import com.jd.im.client.MessageCallBack;
-import com.jd.im.client.MqttClient;
-import com.jd.jrapp.bm.message.Manager.UploadState;
 import com.jd.jrapp.bm.message.db.IMMessage;
 import com.jd.jrapp.bm.message.db.Message;
 import com.jd.jrapp.bm.message.db.MessageDao;

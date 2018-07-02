@@ -23,7 +23,7 @@
 
         <variable
             name="uploadState"
-            type="com.jd.jrapp.bm.message.Manager.UploadState"/>
+            type="com.jd.jrapp.bm.message.manager.UploadState"/>
 
     </data>
 
@@ -46,7 +46,17 @@
             android:textColor="@android:color/white"
             android:textSize="12dp"
             android:visibility="@{imMessage.showTime?View.VISIBLE:View.GONE}" />
-
+        <ImageView
+            android:id="@+id/iv_right"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/tv_message_time"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="20dp"
+            android:cirlce="@{true}"
+            android:imageUrl="@{imMessage.fromAuthorImg}" />
         <LinearLayout
             android:id="@+id/ll_content"
             android:layout_width="wrap_content"
@@ -56,7 +66,6 @@
             android:layout_marginRight="5dp"
             android:layout_marginTop="15dp"
             android:layout_toLeftOf="@id/iv_right"
-            android:layout_toStartOf="@id/iv_right"
             android:orientation="horizontal">
 
             <RelativeLayout
@@ -95,17 +104,7 @@
             </FrameLayout>
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/iv_right"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_alignParentRight="true"
-            android:layout_below="@id/tv_message_time"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="16dp"
-            android:layout_marginTop="20dp"
-            android:cirlce="@{true}"
-            android:imageUrl="@{imMessage.fromAuthorImg}" />
+
 
 
         <TextView
@@ -117,7 +116,6 @@
             android:layout_marginTop="15dp"
             android:background="@drawable/shape_im_time_bg"
             android:clickable="true"
-            android:onClick="@{(v)->MessageFailedExtroInfor.enableClick(imMessage.failedInfor)?delegate.onClick(v,imMessage):void}"
             android:paddingBottom="4dp"
             android:paddingLeft="14dp"
             android:paddingRight="14dp"

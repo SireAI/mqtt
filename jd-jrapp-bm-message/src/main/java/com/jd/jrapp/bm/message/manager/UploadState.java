@@ -1,4 +1,4 @@
-package com.jd.jrapp.bm.message.Manager;
+package com.jd.jrapp.bm.message.manager;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;

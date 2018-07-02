@@ -1,8 +1,6 @@
-package com.jd.jrapp.bm.message.Manager;
+package com.jd.jrapp.bm.message.manager;
 
 import com.jd.jrapp.bm.message.db.IMMessage;
-
-import static com.jd.jrapp.bm.message.Manager.UploadState.UPLOADING;
 
 public class UploadTask {
     private final String taskId;

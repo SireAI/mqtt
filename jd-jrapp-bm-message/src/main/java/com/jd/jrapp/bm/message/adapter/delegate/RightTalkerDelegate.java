@@ -3,15 +3,12 @@ package com.jd.jrapp.bm.message.adapter.delegate;
 import android.view.View;
 
 import com.jd.im.converter.MsgContentResolve;
-import com.jd.jrapp.bm.message.BR;
-import com.jd.jrapp.bm.message.Manager.UploadInfor;
 import com.jd.jrapp.bm.message.R;
 import com.jd.jrapp.bm.message.adapter.Element;
-import com.jd.jrapp.bm.message.constant.Constant;
 import com.jd.jrapp.bm.message.db.IMMessage;
 import com.jd.jrapp.bm.message.model.IMMessageModel;
 import com.jd.jrapp.bm.message.utils.CommonUtils;
-import com.jd.jrapp.bm.message.utils.JSONUtils;
+
 /**
  * =====================================================
  * All Right Reserved
@@ -39,12 +36,13 @@ public class RightTalkerDelegate extends IMDelegate implements EventDelegate{
      * @param view 被点击的view
      */
     @Override
-    public void onClick(View view,IMMessage imMessage) {
+    public void onClick(View view) {
         if(CommonUtils.isFastClick(500)){
             return;
         }
         int id = view.getId();
         if(id == R.id.tv_failed_infor){
+            IMMessage imMessage = new IMMessage();
             if(MsgContentResolve.TEXT_PLAIN.equals(imMessage.getContentType())){
                 imMessageModel.reSendOffLineMessage(imMessage);
             }else if(MsgContentResolve.isFileType(imMessage.getContentType())){

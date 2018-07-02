@@ -2,10 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.example.im.imdemo"
-        minSdkVersion 16
-        targetSdkVersion 27
+        minSdkVersion 14
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -21,23 +22,29 @@ android {
     dataBinding {
         enabled = true
     }
-
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    //    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+//        implementation 'com.android.support:appcompat-v7:23.2.1'
+//    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 //    implementation 'com.jd.jrapp.library:network:1.4.9-20180608-SNAPSHOT'
-    implementation('com.android.support:design:27.1.1') {
+    compile('com.android.support:design:27.0.1') {
         exclude group: 'android.arch.lifecycle'
     }
-    api project(':jd-jrapp-android-protobuffer-converter')
-    implementation project(':jd-jrapp-android-basic-communication')
-    //    implementation 'com.sire:protobuffer-converter:1.0.1'
+    compile project(':jd-jrapp-android-protobuffer-converter')
+    compile project(':jd-jrapp-android-basic-communication')
+//        implementation 'com.sire:protobuffer-converter:1.0.1'
 //        implementation 'com.sire:jd-im:1.0.1'
-    implementation project(':jd-jrapp-bm-message')
-//    implementation 'com.android.support:support-v4:27.1.1'
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    compile project(':jd-jrapp-bm-message')
+//    implementation 'com.android.support:support-v4:23.2.1'
+//    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 
 }

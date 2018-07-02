@@ -1,8 +1,4 @@
-package com.jd.jrapp.bm.message.Manager;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.jd.jrapp.bm.message.utils.CustomUploadDeserialize;
+package com.jd.jrapp.bm.message.manager;
 
 public class UploadInfor {
     private String filePath;

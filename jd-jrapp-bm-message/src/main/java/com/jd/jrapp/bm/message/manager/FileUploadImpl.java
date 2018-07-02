@@ -1,9 +1,7 @@
-package com.jd.jrapp.bm.message.Manager;
+package com.jd.jrapp.bm.message.manager;
 
-import android.content.Context;
 import android.util.Log;
 
-import com.jd.im.heartbeat.net.NetStatusUtil;
 import com.jd.jrapp.bm.message.WebService.FileRequestBody;
 import com.jd.jrapp.bm.message.WebService.MessageWebService;
 import com.jd.jrapp.bm.message.WebService.UploadProgressListener;
@@ -11,9 +9,7 @@ import com.jd.jrapp.bm.message.adapter.TasksExecutor;
 import com.jd.jrapp.bm.message.bean.UploadResult;
 import com.jd.jrapp.bm.message.constant.Constant;
 import com.jd.jrapp.bm.message.db.IMMessage;
-import com.jd.jrapp.bm.message.model.IMMessageModel;
 import com.jd.jrapp.bm.message.model.MessageModel;
-import com.jd.jrapp.bm.message.utils.JSONUtils;
 
 import java.io.File;
 import java.io.IOException;

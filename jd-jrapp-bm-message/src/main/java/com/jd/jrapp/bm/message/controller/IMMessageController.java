@@ -1,10 +1,10 @@
 package com.jd.jrapp.bm.message.controller;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LifecycleRegistry;
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -12,9 +12,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -26,9 +27,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.jd.jrapp.bm.message.Manager.UploadInfor;
-import com.jd.jrapp.bm.message.Manager.UploadManager;
-import com.jd.jrapp.bm.message.Manager.UploadTask;
 import com.jd.jrapp.bm.message.R;
 import com.jd.jrapp.bm.message.adapter.IMMessageAdapter;
 import com.jd.jrapp.bm.message.adapter.delegate.LeftTalkerDelegate;
@@ -41,7 +39,6 @@ import com.jd.jrapp.bm.message.db.IMMessage;
 import com.jd.jrapp.bm.message.model.IMMessageModel;
 import com.jd.jrapp.bm.message.utils.CommonUtils;
 import com.jd.jrapp.bm.message.utils.TimeOffSetUtils;
-import com.jd.jrapp.bm.message.utils.UUIDUtils;
 
 import java.io.File;
 import java.util.Collections;
@@ -61,7 +58,8 @@ import static com.jd.jrapp.bm.message.constant.Constant.PEER_TALKER;
  * Description:
  * ==================================================
  */
-public class IMMessageController extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener, TextWatcher, LoadingDelegate.ICallBack {
+public class IMMessageController extends FragmentActivity implements View.OnClickListener, View.OnFocusChangeListener, TextWatcher, LoadingDelegate.ICallBack,LifecycleOwner {
+    private LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
     public static final int STEP = 15;
     public static final int FIRST_POSITION = 0;
     public static final int DELAY_MILLIS = 500;
@@ -103,7 +101,7 @@ public class IMMessageController extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        model = ViewModelProviders.of(this).get(IMMessageModel.class);
+        model = new IMMessageModel();
         initView();
         initData();
     }
@@ -188,29 +186,29 @@ public class IMMessageController extends AppCompatActivity implements View.OnCli
 
     private void initView() {
         setContentView(R.layout.controller_immessage);
-        ivImMe = findViewById(R.id.iv_im_me);
+        ivImMe = (ImageView) findViewById(R.id.iv_im_me);
         ivImMe.setOnClickListener(this);
-        Toolbar toolBar = findViewById(R.id.toolbar);
+        Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
         Intent intent = getIntent();
         Talker peerTalker = intent.getParcelableExtra(PEER_TALKER);
         model.setTalker(peerTalker);
         toolBar.setTitle(peerTalker.getUserName());
-        setActionBarEnabled(toolBar);
+//        setActionBarEnabled(toolBar);
         //Recyclerview
-        recyclerView = findViewById(R.id.rv_immessage);
+        recyclerView = (RecyclerView) findViewById(R.id.rv_immessage);
         DefaultItemAnimator defaultItemAnimator = new DefaultItemAnimator();
         defaultItemAnimator.setSupportsChangeAnimations(false);
         recyclerView.setItemAnimator(defaultItemAnimator);
         Drawable drawable = getResources().getDrawable(R.drawable.shape_tranluncent);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        dividerItemDecoration.setDrawable(drawable);
-        recyclerView.addItemDecoration(dividerItemDecoration);
+//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+//        dividerItemDecoration.setDrawable(drawable);
+//        recyclerView.addItemDecoration(dividerItemDecoration);
 
         //comment write
-        ibPraise = findViewById(R.id.ib_praise);
+        ibPraise = (ImageButton) findViewById(R.id.ib_praise);
         ibPraise.setOnClickListener(this);
-        tvSend = findViewById(R.id.tv_send);
-        etMessage = findViewById(R.id.et_comment);
+        tvSend = (TextView) findViewById(R.id.tv_send);
+        etMessage = (EditText) findViewById(R.id.et_comment);
         etMessage.setOnClickListener(this);
         etMessage.setOnFocusChangeListener(this);
         tvSend.setOnClickListener(this);
@@ -220,11 +218,11 @@ public class IMMessageController extends AppCompatActivity implements View.OnCli
 
 
 
-    private void setActionBarEnabled(@NonNull Toolbar toolbar) {
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-    }
+//    private void setActionBarEnabled(@NonNull Toolbar toolbar) {
+//        setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
+//    }
 
     /**
      * 设置发送文字按钮状态
@@ -329,4 +327,9 @@ public class IMMessageController extends AppCompatActivity implements View.OnCli
         }
     }
 
+    @NonNull
+    @Override
+    public Lifecycle getLifecycle() {
+        return lifecycleRegistry;
+    }
 }

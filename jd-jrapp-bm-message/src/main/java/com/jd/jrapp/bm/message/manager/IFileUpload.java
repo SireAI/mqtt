@@ -1,6 +1,4 @@
-package com.jd.jrapp.bm.message.Manager;
-
-import android.content.Context;
+package com.jd.jrapp.bm.message.manager;
 
 public interface IFileUpload {
     void upload(UploadTask uploadTask);

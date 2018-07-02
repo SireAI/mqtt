@@ -41,7 +41,7 @@ public class LeftTalkerDelegate extends IMDelegate implements EventDelegate {
     }
 
     @Override
-    public void onClick(View view, IMMessage imMessage) {
+    public void onClick(View view) {
         System.out.println("=======left");
     }
 }

@@ -1,15 +1,9 @@
 package com.example.im.imdemo;
 
-import android.databinding.ObservableInt;
-import android.provider.ContactsContract;
-
-import com.jd.jrapp.bm.message.Manager.UploadInfor;
 import com.jd.jrapp.bm.message.db.IMMessage;
-import com.jd.jrapp.bm.message.utils.JSONUtils;
 import com.jd.jrapp.bm.message.utils.TimeOffSetUtils;
 
 import java.io.File;
-import java.util.Date;
 
 public class test {
     public static void main(String[]args){

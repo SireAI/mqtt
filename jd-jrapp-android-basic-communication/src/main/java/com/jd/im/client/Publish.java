@@ -1,6 +1,5 @@
 package com.jd.im.client;
 
-import android.support.annotation.RestrictTo;
 
 /**
  * =====================================================
@@ -10,7 +9,6 @@ import android.support.annotation.RestrictTo;
  * Description:发布消息封装
  * =====================================================
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
  class Publish {
     private String topic;
     private Object payload;

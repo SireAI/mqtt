@@ -8,8 +8,6 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 
-import com.jd.jrapp.bm.message.Manager.UploadState;
-
 import java.util.Date;
 import java.util.List;
 

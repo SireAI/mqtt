@@ -1,17 +1,9 @@
-package com.jd.jrapp.bm.message.Manager;
-
-import android.content.Context;
+package com.jd.jrapp.bm.message.manager;
 
 import com.jd.im.socket.BlockingLooper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * =====================================================
