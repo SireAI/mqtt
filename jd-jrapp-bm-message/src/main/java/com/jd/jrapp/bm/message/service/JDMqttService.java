@@ -103,12 +103,11 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
         talker.setUserImg(userImg);
         talker.setUserId(userId);
         intent.putExtra(TALKER,talker);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            context.startForegroundService(intent);
-//        } else {
-//            context.startService(intent);
-//        }
-        context.startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
 
     }
 
@@ -177,6 +176,7 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
 
     @Override
     public void onDestroy() {
+        System.out.println("=====销毁");
         super.onDestroy();
         if(mqttClient!=null){
             mqttClient.disconnect();

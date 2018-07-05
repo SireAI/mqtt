@@ -36,13 +36,12 @@ public class RightTalkerDelegate extends IMDelegate implements EventDelegate{
      * @param view 被点击的view
      */
     @Override
-    public void onClick(View view) {
+    public void onClick(View view,IMMessage imMessage) {
         if(CommonUtils.isFastClick(500)){
             return;
         }
         int id = view.getId();
         if(id == R.id.tv_failed_infor){
-            IMMessage imMessage = new IMMessage();
             if(MsgContentResolve.TEXT_PLAIN.equals(imMessage.getContentType())){
                 imMessageModel.reSendOffLineMessage(imMessage);
             }else if(MsgContentResolve.isFileType(imMessage.getContentType())){

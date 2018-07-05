@@ -31,8 +31,8 @@
             app:corner_left_bottom="@dimen/im_big_corner"
             android:imageUrl="@{imMessage.contentObj.imageUrl}"
             android:cirlce="@{false}"
-            app:corner_letf_top="@{side == 1 ? @dimen/im_small_corner : @dimen/im_big_corner}"
-            app:corner_right_bottom="@{side == 1 ? @dimen/im_big_corner : @dimen/im_small_corner}"
+            app:corner_letf_top="@{safeUnbox(side) == 1 ? @dimen/im_small_corner : @dimen/im_big_corner}"
+            app:corner_right_bottom="@{safeUnbox(side) == 1 ? @dimen/im_big_corner : @dimen/im_small_corner}"
             app:corner_right_top="@dimen/im_big_corner" />
 
         <RelativeLayout
@@ -45,7 +45,7 @@
                 android:layout_width="131dp"
                 android:layout_height="144dp"
                 android:alpha="0.5"
-                android:background="@{side == 1 ? @drawable/shape_image_loading_left:@drawable/shape_image_loading_right}" />
+                android:background="@{safeUnbox(side) == 1 ? @drawable/shape_image_loading_left:@drawable/shape_image_loading_right}" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

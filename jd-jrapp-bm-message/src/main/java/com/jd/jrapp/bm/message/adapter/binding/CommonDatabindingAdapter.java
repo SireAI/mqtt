@@ -47,8 +47,6 @@ public class CommonDatabindingAdapter {
                         }
                     });
         } else {
-            System.out.println("false========"+getUrl(url));
-
             Glide.with(view.getContext())
                     .load(getUrl(url))
                     .into(view);

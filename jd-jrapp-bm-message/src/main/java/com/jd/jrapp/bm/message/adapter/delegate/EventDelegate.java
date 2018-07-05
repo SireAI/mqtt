@@ -12,5 +12,5 @@ import com.jd.jrapp.bm.message.db.IMMessage;
  * =====================================================
  */
 public interface EventDelegate {
-    void onClick(View view);
+    void onClick(View view, IMMessage imMessage);
 }

@@ -120,6 +120,7 @@
             android:paddingLeft="14dp"
             android:paddingRight="14dp"
             android:paddingTop="4dp"
+            android:onClick="@{(v)->MessageFailedExtroInfor.enableClick(imMessage.failedInfor)?delegate.onClick(v,imMessage):void}"
             android:text="@{MessageFailedExtroInfor.text(imMessage.failedInfor)}"
             android:textColor="@android:color/white"
             android:textSize="12dp"

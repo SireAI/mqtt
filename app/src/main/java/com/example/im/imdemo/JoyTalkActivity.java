@@ -218,7 +218,7 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
             e.printStackTrace();
         }
     }
-    private boolean isMonitor = true;
+    private boolean isMonitor = false;
     private void gotoIm() {
         Intent intent = new Intent(this, IMMessageController.class);
         Talker peerTalker = new Talker();

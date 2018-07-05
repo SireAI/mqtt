@@ -5,9 +5,10 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 27
+        minSdkVersion 14
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
@@ -50,9 +51,9 @@ protobuf {
 
 
 dependencies {
-    api 'com.google.protobuf.nano:protobuf-javanano:3.2.0rc2'
+    compile 'com.google.protobuf.nano:protobuf-javanano:3.2.0rc2'
 
-    implementation project(':jd-jrapp-android-basic-communication')
+    compile project(':jd-jrapp-android-basic-communication')
 //    implementation 'com.sire:jd-im:1.0.1'
 }
 

@@ -23,7 +23,7 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:paddingTop="9dp"
-        android:textColor="@{side == 1 ? @color/im_talker_left_text:@color/im_talker_right_text}"
+        android:textColor="@{safeUnbox(side) == 1 ? @color/im_talker_left_text:@color/im_talker_right_text}"
         android:text="@{MsgContentResolve.resolve(imMessage.getContentType(),imMessage.getContent())}"
         android:textSize="16dp"
         tool:text="遇见便是是缘分，做程序员几年了？" />

@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -58,7 +59,7 @@ import static com.jd.jrapp.bm.message.constant.Constant.PEER_TALKER;
  * Description:
  * ==================================================
  */
-public class IMMessageController extends FragmentActivity implements View.OnClickListener, View.OnFocusChangeListener, TextWatcher, LoadingDelegate.ICallBack,LifecycleOwner {
+public class IMMessageController extends AppCompatActivity implements View.OnClickListener, View.OnFocusChangeListener, TextWatcher, LoadingDelegate.ICallBack,LifecycleOwner {
     private LifecycleRegistry lifecycleRegistry = new LifecycleRegistry(this);
     public static final int STEP = 15;
     public static final int FIRST_POSITION = 0;
@@ -193,16 +194,16 @@ public class IMMessageController extends FragmentActivity implements View.OnClic
         Talker peerTalker = intent.getParcelableExtra(PEER_TALKER);
         model.setTalker(peerTalker);
         toolBar.setTitle(peerTalker.getUserName());
-//        setActionBarEnabled(toolBar);
+        setActionBarEnabled(toolBar);
         //Recyclerview
         recyclerView = (RecyclerView) findViewById(R.id.rv_immessage);
         DefaultItemAnimator defaultItemAnimator = new DefaultItemAnimator();
         defaultItemAnimator.setSupportsChangeAnimations(false);
         recyclerView.setItemAnimator(defaultItemAnimator);
         Drawable drawable = getResources().getDrawable(R.drawable.shape_tranluncent);
-//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-//        dividerItemDecoration.setDrawable(drawable);
-//        recyclerView.addItemDecoration(dividerItemDecoration);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        dividerItemDecoration.setDrawable(drawable);
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         //comment write
         ibPraise = (ImageButton) findViewById(R.id.ib_praise);
@@ -218,11 +219,11 @@ public class IMMessageController extends FragmentActivity implements View.OnClic
 
 
 
-//    private void setActionBarEnabled(@NonNull Toolbar toolbar) {
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setHomeButtonEnabled(true);
-//    }
+    private void setActionBarEnabled(@NonNull Toolbar toolbar) {
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+    }
 
     /**
      * 设置发送文字按钮状态
