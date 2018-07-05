@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
@@ -85,6 +86,7 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
         return super.onStartCommand(intent, flags, startId);
     }
 
+
     /**
      * 服务启动入口
      * @param context 上下文
@@ -137,7 +139,6 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
                 .setPassword(MessageModel.getInstance().getPassword())
                 .setProtocalName(MQTTVersion.VERSION_IM)
                 ;
-
         mqttClient.connect(mqttConnectOptions, new ConnectCallBack<DisconnectMessage.Disconnect>() {
 
 
@@ -226,6 +227,7 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
      * 处理丢失回调或者没有回调的PUBLISH消息
      * @param messageAck
      */
+    @MainThread
     @Override
     public void onSuccess(Ack.MessageAck messageAck) {
         if(messageAck!=null){

@@ -28,7 +28,8 @@ joytalk是京东金融以mqtt协议为通讯协议的Android客户端长连接�
  MqttClient mqttClient = new MqttClient.Builder()
                 .context(this)
                 .converter(ProtobufferConverterFactory.create())//默认的数据解析方式为String
-                .pushCallBack(this)//服务端主动push数据回调
+                .pushCallBack(this)//服务端主动push数据回调,该回调在异步线程中执行
+                .defaultOperateCallBack(this)//默认操作回调，处理丢失或者没有操作回调的消息,比如服务器在应用启动时返回了上次没有给的应答消息,主线程中运行
                 .qos(QOS_2) //质量等级，默认是qos_1
                 .openLog() //是否打开调试日志，默认关闭,建议正式版本关闭
                 .build();
