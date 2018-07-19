@@ -33,6 +33,10 @@ public class MqttConnectOptions extends IMqttConnectOptions.Stub {
      */
     public static final int CONNECTION_TIMEOUT_DEFAULT = 10000;
     /**
+     * 消息超时时间，s单位
+     */
+    public static final int MESSAGE_SEND_TIMEOUT_DEFAULT = 30000;
+    /**
      * 消息最大在飞时间
      */
     public static final int MAX_INFLIGHT_DEFAULT = 10;
@@ -56,6 +60,7 @@ public class MqttConnectOptions extends IMqttConnectOptions.Stub {
     private char[] password;
     private boolean cleanSession = CLEAN_SESSION_DEFAULT;
     private int connectionTimeout = CONNECTION_TIMEOUT_DEFAULT;
+    private int messageSendTimeout = MESSAGE_SEND_TIMEOUT_DEFAULT;
     private String clientId ;
     private String protocalName = MQTTVersion.VERSION_IM;
     /**
@@ -148,6 +153,10 @@ public class MqttConnectOptions extends IMqttConnectOptions.Stub {
         return this;
     }
 
+    public MqttConnectOptions setMessageSendTimeout(int messageSendTimeout) {
+        this.messageSendTimeout = messageSendTimeout;
+        return this;
+    }
 
     @Override
     public String[] getServerURIs() {
@@ -242,6 +251,11 @@ public class MqttConnectOptions extends IMqttConnectOptions.Stub {
     @Override
     public int getReconnectCount() throws RemoteException {
         return this.reconnectCount;
+    }
+
+    @Override
+    public int getMessageSendTimeout() throws RemoteException {
+        return messageSendTimeout;
     }
 
     public MqttConnectOptions setReconnectCount(int reconnectCount) {

@@ -31,5 +31,7 @@ interface IMqttConnectOptions {
 
       int getReconnectCount();
 
+      int getMessageSendTimeout();
+
 
 }

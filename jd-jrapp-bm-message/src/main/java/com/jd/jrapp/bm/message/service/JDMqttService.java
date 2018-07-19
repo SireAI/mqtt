@@ -38,9 +38,9 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
     private static final String TAG = "JDMqttService";
     public static final int KEEP_ALIVE_INTERVAL = 8 * 60000;
     //
-//    final String serverUri = "tcp://iot.eclipse.org:1883";
+    final String serverUri = "tcp://iot.eclipse.org:1883";
     //测试环境地址
-    final String serverUri = "tcp://172.25.47.19:8183";
+//    final String serverUri = "tcp://172.25.47.19:8183";
 //    final String serverUri = "tcp://10.13.82.243:8183";
     //外网可访问
 //    final String serverUri = "tcp://59.151.64.31:8935";
@@ -137,7 +137,7 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
                 .setServerURIs(new String[]{serverUri})
                 .setUserName(MessageModel.getInstance().getUserName())
                 .setPassword(MessageModel.getInstance().getPassword())
-                .setProtocalName(MQTTVersion.VERSION_IM)
+                .setProtocalName(MQTTVersion.VERSION_311)
                 ;
         mqttClient.connect(mqttConnectOptions, new ConnectCallBack<DisconnectMessage.Disconnect>() {
 
@@ -177,7 +177,6 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
 
     @Override
     public void onDestroy() {
-        System.out.println("=====销毁");
         super.onDestroy();
         if(mqttClient!=null){
             mqttClient.disconnect();

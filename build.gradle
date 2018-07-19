@@ -1,29 +1,41 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+apply from: "config.gradle"
+
+
 buildscript {
-    
+//
+//    repositories {
+//
+////        maven { url  "https://dl.bintray.com/jdfinance/sire-maven" }
+////        maven{ url 'http://nexus.cbpmgt.com/nexus/content/groups/public' }
+////        maven{ url 'http://nexus.cbpmgt.com/nexus/content/repositories/snapshots' }
+////        google()
+//        maven { url  "https://maven.google.com/" }
+//
+//        jcenter()
+//
+//        maven {
+//            url "https://plugins.gradle.org/m2/"
+//        }
+//        maven { url "http://artifactory.jd.com/libs-releases-local/" }
+//
+//
+//    }
+
     repositories {
 
-//        maven { url  "https://dl.bintray.com/jdfinance/sire-maven" }
-//        maven{ url 'http://nexus.cbpmgt.com/nexus/content/groups/public' }
-//        maven{ url 'http://nexus.cbpmgt.com/nexus/content/repositories/snapshots' }
-//        google()
-        maven { url  "https://maven.google.com/" }
-
-        jcenter()
-
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-        maven { url "http://artifactory.jd.com/libs-releases-local/" }
-
-
+        //京东金融私服-正式仓库
+        maven{ url 'http://nexus.cbpmgt.com/nexus/content/groups/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
 
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
+//        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+
+//        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

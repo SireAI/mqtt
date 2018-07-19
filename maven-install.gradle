@@ -1,0 +1,114 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+// Maven Group ID for the artifact
+group = publishedGroupId
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                groupId publishedGroupId
+                artifactId artifact
+
+                // Add your description here
+                name libraryName
+                description libraryDescription
+                url siteUrl
+
+                // Set your license
+                licenses {
+                    license {
+                        name licenseName
+                        url licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id developerId
+                        name developerName
+                        email developerEmail
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+version = libraryVersion
+
+//注意不要放开注释,否则会吧源码和javadoc上传到仓库
+
+// Android libraries
+//if (project.hasProperty("android")) {
+//    task sourcesJar(type: Jar) {
+//        classifier = 'sources'
+//        from android.sourceSets.main.java.srcDirs
+//    }
+//
+//    task javadoc(type: Javadoc) {
+//        failOnError false
+//        source = android.sourceSets.main.java.srcDirs
+//        options {
+//            encoding "UTF-8"
+//            charSet 'UTF-8'
+//            author true
+//            version true
+//            links "http://docs.oracle.com/javase/7/docs/api/"
+//            linksOffline "http://d.android.com/reference", "${android.sdkDirectory}/docs/reference"
+//        }
+//        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//    }
+//} else { // Java libraries
+//    task sourcesJar(type: Jar, dependsOn: classes) {
+//        classifier = 'sources'
+//        from sourceSets.main.allSource
+//    }
+//}
+//
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
+//
+//artifacts {
+//    archives javadocJar
+//    archives sourcesJar
+//}
+
+
+//任务名
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            //这里的url是nexus中maven-releases的路径，可以点击copy按钮查看复制
+            repository(url: "http://nexus.cbpmgt.com/nexus/content/repositories/snapshots") {
+                // nexus账号的用户名和密码，我这里没用默认的admin
+//                File propFile = file('../keystore/config.properties');
+//                def Properties props = new Properties()
+//                if (propFile.exists()) {
+//                    props.load(propFile.newReader("UTF-8"))
+//                    def repositoryUserName = props['nexus.user']
+//                    def repositoryPassword = props['nexus.password']
+//                    authentication(userName: repositoryUserName, password: repositoryPassword)
+//                }
+                authentication(userName: 'snapshot', password: '4AC8EMK#FrykJfG7')
+            }
+
+            // 下面这三项pom参数-->compile 'publishedGroupId:artifactId:version'
+
+            // library的包名
+            pom.groupId = publishedGroupId
+            // library的项目名
+            pom.artifactId = artifact
+            // library的版本号
+            pom.version = libraryVersion
+        }
+    }
+}

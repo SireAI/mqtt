@@ -1,5 +1,32 @@
 
 apply plugin: 'com.android.library'
+ext {
+    bintrayRepo = rootProject.ext.maven.bintrayRepo
+    bintrayName = 'mqtt-socket'
+
+    publishedGroupId = rootProject.ext.maven.publishedGroupIdForLib
+    artifact = 'mqtt-socket'
+
+    libraryVersion = '1.0.1-20180719-SNAPSHOT'
+
+    libraryName = 'mqtt-socket'
+    libraryDescription = 'JDJRAPP sh busniess module'
+
+    siteUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
+    gitUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
+
+    developerId = rootProject.ext.maven.developerId
+    developerName = rootProject.ext.maven.developerName
+    developerEmail = rootProject.ext.maven.developerEmail
+
+    allLicenses = rootProject.ext.maven.allLicenses
+    licenseName = rootProject.ext.maven.licenseName
+    licenseUrl =  rootProject.ext.maven.licenseUrl
+}
+
+
+
+
 
 android {
     compileSdkVersion 27
@@ -29,4 +56,5 @@ dependencies {
 }
 
 //apply from: '../publish.gradle'
+apply from: '../maven-install.gradle'
 

@@ -44,6 +44,7 @@ joytalk是京东金融以mqtt协议为通讯协议的Android客户端长连接�
                 .setKeepAliveInterval(8*60000)//服务端保持长连接最大时长
                 // ，若超过则会主动断开连接，此值会影响心跳探测最大间隔，建议使用默认8分钟
                 .setServerURIs(new String[]{serverUri})//服务器地址
+                .setMessageSendTimeout(60)//消息超时时间
                 .setUserName("222")//账号
                 .setPassword("sire")//密码
                 .setProtocalName(MQTTVersion.VERSION_311);//协议名

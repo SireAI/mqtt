@@ -73,7 +73,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     /**
      * 默认信息发送超时时间,单位s
      */
-    private static final int MESSAGE_DELIVERRY_RETRAY_INTERVAL = 20;
+    private static  int MESSAGE_DELIVERRY_RETRAY_INTERVAL = 30;
     /**
      * 客户端标识，用于处理不同服务地址问题
      */
@@ -147,7 +147,6 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         imRemoteService = new IMRemoteServiceImpl(this);
         mqttQos = new MqttQos(this);
         messageStore = new DatabaseMessageStore(this);
-        startTimingWheel();
         startDataWorker();
     }
 
@@ -231,6 +230,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     public void onSocketSuccees() {
         Log.d(TAG, "MQTT建立连接,发送连接验证消息....");
         //长链建立，发送长链验证消息
+        startTimingWheel();
         connect();
     }
 
@@ -769,12 +769,20 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     }
 
     /**
-     * 重试间隔事件默认30秒
+     * 重试间隔事件默认最小30秒
      */
     private void startTimingWheel() {
-        eventTimingWheel = new TimingWheel<>(1, MESSAGE_DELIVERRY_RETRAY_INTERVAL, TimeUnit.SECONDS);
-        eventTimingWheel.start();
-        eventTimingWheel.addExpirationListener(this);
+        if(eventTimingWheel==null){
+            try {
+                int messageSendTimeout = connectOptions.getMessageSendTimeout();
+                MESSAGE_DELIVERRY_RETRAY_INTERVAL = Math.max(messageSendTimeout,MESSAGE_DELIVERRY_RETRAY_INTERVAL);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+            eventTimingWheel = new TimingWheel<>(1, MESSAGE_DELIVERRY_RETRAY_INTERVAL, TimeUnit.SECONDS);
+            eventTimingWheel.start();
+            eventTimingWheel.addExpirationListener(this);
+        }
     }
 
     private void stopTimingWheel() {

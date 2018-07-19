@@ -1,0 +1,117 @@
+/**
+ * ext自定义[App全局环境变量配置]属性
+ *
+ * @author 曾繁添
+ * @version 1.0
+ *
+ */
+
+def jdjr_repo_snapshots = 'http://nexus.cbpmgt.com/nexus/content/repositories/snapshots';
+def jdjr_repo_release = 'http://nexus.cbpmgt.com/nexus/content/groups/public';
+
+ext {
+    //app配置
+    app = [
+            applicationId: "com.jd.jrapp",
+            versionCode  : 78,
+            versionName  : "4.9.7"
+    ]
+
+    //编译环境配置
+    android = [
+            compileSdkVersion: 27,
+            //24+版本解决[too many classes in –main-dex-list, main dex capacity exceeded] v4.2.0 20170704
+            buildToolsVersion: "27.0.3",
+            minSdkVersion    : 14,
+            //23需要特殊处理动态授权
+            targetSdkVersion : 22
+    ]
+
+    //maven发布相关配置
+    maven = [
+            repo_snapshots        : jdjr_repo_snapshots,
+            repo_release          : jdjr_repo_release,
+
+            bintrayRepo           : 'android',
+            publishedGroupIdForLib: "com.jd.jrapp.library",
+            publishedGroupIdForBm : "com.jd.jrapp.bm",
+
+            developerId           : 'jd-jrapp',
+            developerName         : '京东金融移动研发团队',
+            developerEmail        : 'jrm-client@jd.com',
+
+            allLicenses           : '["JDJR-2.0"]',
+            licenseName           : 'The JD Software License, Version 2.0',
+            licenseUrl            : 'http://www.jd.com/'
+    ]
+
+    //谷歌官方基础配置
+    basicDependencies = [
+            support_v4              : 'com.android.support:support-v4:27.1.1',
+            support_v7              : 'com.android.support:appcompat-v7:27.1.1',
+            support_annotations     : 'com.android.support:support-annotations:27.1.1',
+            cardview_v7             : 'com.android.support:cardview-v7:27.1.1',
+            percent                 : 'com.android.support:percent:27.1.1',
+            design                  : 'com.android.support:design:27.1.1',
+            multidex                : 'com.android.support:multidex:1.0.3',
+            multidex_instrumentation: 'com.android.support:multidex-instrumentation:1.0.3',
+            recyclerview            : 'com.android.support:recyclerview-v7:27.1.1',
+            constraint              : 'com.android.support.constraint:constraint-layout:1.0.2',
+            junit                   : 'junit:junit:4.12',
+            fastjson                : 'com.alibaba:fastjson:1.2.7',
+            nineoldandroids         : 'com.nineoldandroids:library:2.4.0',
+            wheelpicker             : 'cn.aigestudio.wheelpicker:WheelPicker:1.1.2',
+            greendao                : 'org.greenrobot:greendao:3.2.2',
+            eventbus                : 'org.greenrobot:eventbus:3.0.0'
+    ]
+
+    //京东金融类库基础配置
+    /**
+     *
+     * 例：network:1.4.9-20180510-SNAPSHOT  20180510为大版本号
+     *
+     * 如果测试使用，请自己编译带小版本号的版本，如：20180510-01-SNAPSHOT
+     */
+    libDependencies = [
+//            common_ui           : 'com.jd.jrapp.library:common-ui:1.0.0-20180615-SNAPSHOT',
+            common_ui           : 'com.jd.jrapp.library:common-ui:1.0.0-20180704-SNAPSHOT',
+            common_resource     : 'com.jd.jrapp.library:common-resource:1.0.5-20180702-no-res-SNAPSHOT',
+            //回退春详修改secturty导致的包变更bug
+            network             : 'com.jd.jrapp.library:network:1.4.9-201806220004-SNAPSHOT',
+            //最新版1.0.2-20180510-SNAPSHOT引入了fb的图片库导致和v4-23、24两个版本代码冲突
+            imageloader         : 'com.jd.jrapp.library:imageloader:1.0.3-20180625-SNAPSHOT',
+            widget              : 'com.jd.jrapp.library:widget:1.0.4-20180612-SNAPSHOT',
+            chart               : 'com.jd.jrapp.library:chart:1.0.0-SNAPSHOT',
+            tools               : 'com.jd.jrapp.library:tools:1.0.1-20180615-SNAPSHOT',
+            stacktrace          : 'com.jd.jrapp.library:stacktrace:1.0.5-201806071810-SNAPSHOT',
+            sharesdk            : 'com.jd.jrapp.library:sharesdk:1.0.2-20180410-SNAPSHOT',
+            security            : 'com.jd.jrapp.library:security:1.0.2-201806110002-rollback-SNAPSHOT',
+            json                : 'com.jd.jrapp.library:json:1.0.0-SNAPSHOT',
+            kepler              : 'com.jd.jrapp.library:kepler:2.2.0-SNAPSHOT',
+            keeplive            : 'com.jd.jrapp.library:keeplive:1.0.2-20180529-SNAPSHOT',
+            downloader          : 'com.jd.jrapp.library:downloader:1.0.2-20180408-SNAPSHOT',
+            wallet_plugin_bridge: 'com.jd.jrapp.library:wallet-plugin-bridge:1.6.1-20180328-SNAPSHOT',
+            jrplugin_release    : 'com.jd.jrapp.library:jrplugin:2.2.4-20180530-release-dependencies-SNAPSHOT',
+            jrplugin_debug      : 'com.jd.jrapp.library:jrplugin:2.2.4-20180530-debug-dependencies-SNAPSHOT',
+            jrplugin_bridge     : 'com.jd.jrapp.library:jrplugin-bridge:2.2.2-20180409-nodepend-SNAPSHOT',
+            react_native        : 'com.jd.jrapp.library:react-native:0.47.1-SNAPSHOT',
+            jr_rn               : 'com.jd.jrapp.library:jr-rn:1.0.3-20180626-SNAPSHOT',
+            qidian              : 'com.jd.jrapp.library:qidian:0.2.5.20180628.02-SNAPSHOT',
+            task                : 'com.jd.jrapp.library:task:1.0.1-20180411-SNAPSHOT',
+            database            : 'com.jd.jrapp.library:database:1.0.2-20180411-SNAPSHOT',
+//            basic_framework     : 'com.jd.jrapp.library:basic-framework:1.0.4-20180628-SNAPSHOT',
+            basic_framework     : 'com.jd.jrapp.library:basic-framework:1.0.4-20180704-SNAPSHOT',
+            push                : 'com.jd.jrapp.library:push:1.0.0-2018062601-SNAPSHOT',
+            mlbs                : 'com.jd.jrapp.library:mlbs:1.0.0-20180529-SNAPSHOT',
+            tbs_x5              : 'com.jd.jrapp.library:tbs-x5:3.6.0',
+            jdmasdk             : 'com.jingdong.wireless.libs:jdmasdk:2.0.1'
+    ]
+
+    //京东金融组件aar配置
+    bmDependencies = [
+            bm_common       : 'com.jd.jrapp.bm:common:1.0.1-20180611-min-dependencies-SNAPSHOT',
+            zhyy_dynamicpage: 'com.jd.jrapp.bm:zhyy-dynamicpage:1.0.3-20180611-SNAPSHOT'
+            //zhyy_jsq     : 'com.jd.jrapp.bm.zhyy:jsq:1.0.0',
+            //zhyy_calendar: 'com.jd.jrapp.bm.zhyy:calendar:1.0.0'
+    ]
+}
