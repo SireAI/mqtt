@@ -7,6 +7,7 @@ import com.jd.im.mqtt.MQTTHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 
 
 import static com.jd.im.mqtt.MQTTConstants.PUBREL;
@@ -59,7 +60,7 @@ public class MQTTPubrel extends MQTTMessage {
       System.arraycopy(buffer, i, payload, 0, payload.length);
 
     // Only get package identifier if the QoS is above AT_MOST_ONCE
-    packageIdentifier = (variableHeader[variableHeader.length - 1]) | (variableHeader[variableHeader.length - 2]);
+    packageIdentifier = new BigInteger(1, variableHeader).intValue();
   }
 
   @Override

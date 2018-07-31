@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 
 import static com.jd.im.mqtt.MQTTConstants.UNSUBSCRIBE;
 
@@ -43,7 +44,7 @@ public class MQTTUnsubscribe extends MQTTMessage implements Persistentable{
             setRemainingLength(remainingLength);
             variableHeader = new byte[2];
             System.arraycopy(data, i, variableHeader, 0, variableHeader.length);
-            packageIdentifier = (variableHeader[variableHeader.length - 2] >> 8 & 0xFF) | (variableHeader[variableHeader.length - 1] & 0xFF);
+            packageIdentifier = new BigInteger(1, variableHeader).intValue();
             dis.read(new byte[i+1]);
             readed = 1;
             while (readed < remainingLength) {

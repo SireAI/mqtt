@@ -5,6 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.MainThread;
 import android.support.annotation.Nullable;
@@ -29,6 +30,8 @@ import com.jd.jrapp.bm.message.bean.Talker;
 import com.jd.jrapp.bm.message.constant.Constant;
 import com.jd.jrapp.bm.message.model.MessageModel;
 
+import java.util.UUID;
+
 import static com.jd.im.mqtt.MQTTConstants.QOS_1;
 import static com.jd.jrapp.bm.message.constant.Constant.CONNECT_NAME;
 import static com.jd.jrapp.bm.message.constant.Constant.CONNECT_PASSWORD;
@@ -38,13 +41,14 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
     private static final String TAG = "JDMqttService";
     public static final int KEEP_ALIVE_INTERVAL = 8 * 60000;
     //
-    final String serverUri = "tcp://iot.eclipse.org:1883";
+//    final String serverUri = "tcp://iot.eclipse.org:1883";
     //测试环境地址
 //    final String serverUri = "tcp://172.25.47.19:8183";
 //    final String serverUri = "tcp://10.13.82.243:8183";
+//    final String serverUri = "tcp://pnsmqtt-server.jdpay.com:8183";
     //外网可访问
 //    final String serverUri = "tcp://59.151.64.31:8935";
-//    final String serverUri = "tcp://10.13.80.235:8183";
+    final String serverUri = "tcp://10.13.81.148:8183";
     final String subscriptionTopic = "AndroidTopic";
     //    final String subscriptionTopic = "RT";
     final String publishTopic = "AndroidPublishTopic";
@@ -117,10 +121,10 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
     public void onCreate() {
         mqttClient = new MqttClient.Builder()
                 .context(this)
-                .converter(ProtobufferConverterFactory.create()
-                        .bindPublish(ClientPublishMessage.MessageResponse.class)
-                        .bindDisconnect(DisconnectMessage.Disconnect.class)
-                        .bindAck(Ack.MessageAck.class))
+//                .converter(ProtobufferConverterFactory.create()
+//                        .bindPublish(ClientPublishMessage.MessageResponse.class)
+//                        .bindDisconnect(DisconnectMessage.Disconnect.class)
+//                        .bindAck(Ack.MessageAck.class))
                 .pushCallBack(this)
                 .defaultOperateCallBack(this)
                 .qos(QOS_1)
@@ -132,7 +136,7 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions()
                 .setAutomaticReconnect(true)
                 .setCleanSession(false)
-                .setClientId(MessageModel.getInstance().getClientId())
+                .setClientId(UUID.randomUUID().toString())
                 .setKeepAliveInterval(KEEP_ALIVE_INTERVAL)
                 .setServerURIs(new String[]{serverUri})
                 .setUserName(MessageModel.getInstance().getUserName())
@@ -151,6 +155,7 @@ public class JDMqttService extends Service implements MqttClient.PushCallBack<Cl
             public void onConnectSuccess() {
                 subscribeTopic();
                 Log.d(TAG,"连接成功");
+
             }
 
             @Override

@@ -30,7 +30,6 @@ public class PublishHeaderExtraPart extends IVariableHeaderExtraPart.Stub {
     @Override
     public byte[] extraVariableHeaderPart() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
         byte extraInfor = (byte) (((codingType << 4) | ((messageType >> 8) & 0xF)) & 0xFF);
         byte operationType = (byte) (messageType & 0xFF);
         outputStream.write(extraInfor);

@@ -3,20 +3,11 @@
 
     <item
         is-multidex="false"
-        jar="/Users/wangkai51/Sire/coderepository/joytalk/jd-jrapp-bm-message/build/intermediates/bundles/default/classes.jar"
-        jumboMode="false"
-        optimize="true"
-        revision="27.0.3"
-        sha1="b26a787ffa34cfb6db31bd5a6d18f420137e1a7c">
-        <dex dex="/Users/wangkai51/Sire/coderepository/joytalk/app/build/intermediates/pre-dexed/debug/classes_b63b49b0e7cc24d948e0ae2790e5e9ce33eacc2c.jar" />
-    </item>
-    <item
-        is-multidex="false"
         jar="/Users/wangkai51/Sire/coderepository/joytalk/jd-jrapp-android-basic-communication/build/intermediates/bundles/default/classes.jar"
         jumboMode="false"
         optimize="true"
         revision="27.0.3"
-        sha1="44311172f35e9888cef2ca15ec82b0eb4c867fde">
+        sha1="8c6a50dc019f40fd94d4a1b4db380b9d25ba7f95">
         <dex dex="/Users/wangkai51/Sire/coderepository/joytalk/app/build/intermediates/pre-dexed/debug/classes_d638ac596ec4a3b3620623c9f0374b06f6d60c95.jar" />
     </item>
     <item
@@ -27,6 +18,51 @@
         revision="27.0.3"
         sha1="6da17d5f49b6fbc7ad399d762e3afe75dbec747e">
         <dex dex="/Users/wangkai51/Sire/coderepository/joytalk/app/build/intermediates/pre-dexed/debug/classes_f048e8aa71a289d88c38abe1c8529b32b74f1d4d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/wangkai51/.android/build-cache/652169f45026324e994f438049ec9dae1b6dd1bb/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="2632b3cc8188e63a6089e72e9d2823ca07b9b25f">
+        <dex dex="/Users/wangkai51/Sire/coderepository/joytalk/app/build/intermediates/pre-dexed/debug/classes_2f9696903b809ba9f09098df7776e89d73de0f2c.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/wangkai51/Sire/coderepository/joytalk/jd-jrapp-bm-message/build/intermediates/bundles/default/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="af4742782e507b8e9b7e34027b9b6dc8d541db53">
+        <dex dex="/Users/wangkai51/Sire/coderepository/joytalk/app/build/intermediates/pre-dexed/debug/classes_b63b49b0e7cc24d948e0ae2790e5e9ce33eacc2c.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/wangkai51/Sire/coderepository/joytalk/databuffer/build/intermediates/bundles/default/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="f9db545fdd45f69221d1e4d43d2a866c513897a8">
+        <dex dex="/Users/wangkai51/Sire/coderepository/joytalk/app/build/intermediates/pre-dexed/debug/classes_ca4cec0f070899e94b8536bb07fd89bc1a27954d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/wangkai51/.android/build-cache/896b3679055f9e6cfe9091c106d3aebe323fbb5e/output/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="a510df52da6402338b2debf32e637277de18c293">
+        <dex dex="/Users/wangkai51/Sire/coderepository/joytalk/app/build/intermediates/pre-dexed/debug/classes_624a99b23dbe08a63f17c2fa7db6e2a89860488f.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/Users/wangkai51/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.8.2/3edcfe49d2c6053a70a2a47e4e1c2f94998a49cf/gson-2.8.2.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="27.0.3"
+        sha1="3edcfe49d2c6053a70a2a47e4e1c2f94998a49cf">
+        <dex dex="/Users/wangkai51/Sire/coderepository/joytalk/app/build/intermediates/pre-dexed/debug/gson-2.8.2_52b29272fa4dc367b312ba14ae77dc782607f7cc.jar" />
     </item>
 
 </items>

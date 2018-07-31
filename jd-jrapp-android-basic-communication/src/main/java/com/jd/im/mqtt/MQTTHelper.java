@@ -6,6 +6,10 @@ import android.os.RemoteException;
 import com.jd.im.IMQTTMessage;
 import com.jd.im.mqtt.messages.MQTTMessage;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+
 import static com.jd.im.mqtt.MQTTConstants.CONNACK;
 import static com.jd.im.mqtt.MQTTConstants.CONNECT;
 import static com.jd.im.mqtt.MQTTConstants.DISCONNECT;
@@ -159,5 +163,38 @@ public class MQTTHelper {
       return "Unknown message type";
     }
   }
+  public static MultiByteInteger readMBI(DataInputStream in) throws IOException {
 
+    byte digit;
+    long msgLength = 0;
+    int multiplier = 1;
+    int count = 0;
+
+    do {
+      digit = in.readByte();
+      count++;
+      msgLength += ((digit & 0x7F) * multiplier);
+      multiplier *= 128;
+    } while ((digit & 0x80) != 0);
+
+    return new MultiByteInteger(msgLength, count);
+  }
+
+  public static byte[] encodeMBI( long number) {
+    int numBytes = 0;
+    long no = number;
+    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    // Encode the remaining length fields in the four bytes
+    do {
+      byte digit = (byte)(no % 128);
+      no = no / 128;
+      if (no > 0) {
+        digit |= 0x80;
+      }
+      bos.write(digit);
+      numBytes++;
+    } while ( (no > 0) && (numBytes<4) );
+
+    return bos.toByteArray();
+  }
 }

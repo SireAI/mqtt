@@ -1,4 +1,6 @@
 package com.sire.micro.databuffer.command;
 
-public class DeleteOperate {
+import com.sire.micro.databuffer.command.core.ICommand;
+
+public interface DeleteCommand extends ICommand{
 }

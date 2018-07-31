@@ -7,7 +7,7 @@ import com.jd.im.mqtt.MQTTHelper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
+import java.util.Arrays;
 
 
 public  class MQTTMessage extends IMQTTMessage.Stub {

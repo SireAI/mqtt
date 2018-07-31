@@ -3,10 +3,11 @@ package com.example.im.imdemo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -29,9 +30,13 @@ import com.jd.jrapp.bm.message.bean.Talker;
 import com.jd.jrapp.bm.message.controller.IMMessageController;
 import com.jd.jrapp.bm.message.service.JDMqttService;
 import com.jd.jrapp.bm.message.utils.CommonUtils;
+import com.sire.micro.databuffer.DataBuffer;
+import com.sire.micro.databuffer.command.Result;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 
 import paho.mqtt.java.example.R;
@@ -44,7 +49,8 @@ import static com.jd.jrapp.bm.message.constant.Constant.PEER_TALKER;
 public class JoyTalkActivity extends FragmentActivity implements MqttClient.PushCallBack<Object> {
     private static final String TAG = "JoyTalkActivity";
     //
-    final String serverUri = "tcp://iot.eclipse.org:1883";
+//    final String serverUri = "tcp://iot.eclipse.org:1883";
+    final String serverUri = "tcp://10.13.81.148:8183";
     //测试环境地址
 //    final String serverUri = "tcp://172.25.47.19:8183";
     //外网可访问
@@ -88,11 +94,40 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
             if(isMonitor){
                 JDMqttService.start(this,"1","sire","1","sire","http://www.lagou.com/image2/M00/01/5C/CgqLKVXj66GAaM2cAAFq682mH60142.png");
             }else {
-                JDMqttService.start(this,"2","jhon","2","jhon","http://screen.uimg.cn/cc/9b/cc9b7ec9af34a15bd6f94190e8519fc4.jpg");
+                JDMqttService.start(this,"jdpay/testuser","passwd","2","jhon","http://screen.uimg.cn/cc/9b/cc9b7ec9af34a15bd6f94190e8519fc4.jpg");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < 70000; i++) {
+                            MqttClient.getInstance().publish("ss","测试"+i);
+
+                        }
+                    }
+                },10000);
             }
         }
 
 //        testUpload();
+
+        testCache();
+    }
+
+    private void testCache() {
+        final long start = SystemClock.uptimeMillis();
+        DataBuffer.prepare(this, DataBuffer.AUTOMATIC, new Result() {
+            @Override
+            public void onResult(boolean success) {
+                System.out.println("========数据加载成功:"+(SystemClock.uptimeMillis()-start)+"ms");
+            }
+        });
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                for (int i = 0; i < 40; i++) {
+//                    DataBuffer.get().put("测试Key"+i,"我是测试我是测试我是测试我是测试我是测试我是测试我是测试我是测试我是测试");
+//                }
+//            }
+//        },3000);
     }
 
     private void testUpload() {
@@ -101,7 +136,7 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
             System.out.println("-----"+externalStorageDirectory.getPath()+"/test.png");
 //            UploadTask uploadTask = new UploadTask(UUIDUtils.generateSingleId());
 //            uploadTask.setUploadInfor(new UploadInfor(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).getPath()+"/test.png","test",30+"","image"));
-//            UploadManager.getInstance().addUploadTask(uploadTask);
+//            UploadManager.get().addUploadTask(uploadTask);
         }
 
     }
@@ -204,7 +239,8 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
 //        subscribe();
 //        unSubscribe();//有问题，订阅无法取消
 //        publishImage();
-        gotoIm();
+//        gotoIm();
+        addCacheData();
         try {
 //            MqttMessage message = new MqttMessage();
 //            message.setPayload(publishMessage.getBytes());
@@ -218,6 +254,35 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
             e.printStackTrace();
         }
     }
+
+    private void addCacheData() {
+        String key = "测试" + new Random().nextInt(100000);
+        System.out.println("======="+key);
+//        String[] arrays = new String[]{"1","2","3","4","5","6","7"};
+//        boolean[] bl = new boolean[]{true,false,true,false};
+//        List<TestData> ds = new ArrayList<>();
+//        ds.add(new TestData());
+//        ds.add(new TestData());
+//        ds.add(new TestData());
+//        ds.add(new TestData());
+        DataBuffer.get().openLog();
+        DataBuffer.get().put(key,"fadsfasffsd");
+//        TestData[] testDatas = new TestData[]{new TestData(),new TestData(),new TestData()};
+//        DataBuffer.get().put(key,ds);
+//        for (int i = 0; i < 10; i++) {
+//            SystemClock.sleep(500);
+//            int topic = i%3;
+//            DataBuffer.get().buildTopicCache(topic,30,5*60*1000);
+//            String key = "测试" + new Random().nextInt(100000);
+//            DataBuffer.get().put(topic,key,"fasdfsa1");
+//
+//        }
+//        DataBuffer.get().deleteTopic(1);
+
+//        Object o = DataBuffer.get().get(4,"TT");
+//        System.out.println("=="+o);
+    }
+
     private boolean isMonitor = false;
     private void gotoIm() {
         Intent intent = new Intent(this, IMMessageController.class);
@@ -266,6 +331,12 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
                 System.out.println("==============onFailed:" + exception.getMessage());
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        DataBuffer.get().onDestroy();
     }
 
     private void disconnect() {

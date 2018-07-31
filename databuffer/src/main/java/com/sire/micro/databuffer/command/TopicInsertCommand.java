@@ -3,13 +3,13 @@ package com.sire.micro.databuffer.command;
 import com.sire.micro.databuffer.command.core.ICommand;
 import com.sire.micro.databuffer.command.core.IReceiver;
 
-public class TopicCacheInsertCommand implements ICommand {
+public class TopicInsertCommand implements ICommand {
     private final int topic;
     private final int maxSize;
     private final long expiredTime;
     private final IReceiver receiver;
 
-    public TopicCacheInsertCommand(IReceiver receiver, int topic, int maxSize, long expiredTime) {
+    public TopicInsertCommand(IReceiver receiver, int topic, int maxSize, long expiredTime) {
         this.receiver = receiver;
         this.topic = topic;
         this.maxSize = maxSize;

@@ -1,1 +1,1 @@
-include ':app', ':jd-jrapp-android-basic-communication', ':jd-jrapp-android-protobuffer-converter', ':jd-jrapp-bm-message'
+include ':app', ':jd-jrapp-android-basic-communication', ':jd-jrapp-android-protobuffer-converter', ':jd-jrapp-bm-message', ':databuffer'

@@ -363,10 +363,10 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
     }
 
 
-    private void publish(String topic, byte[] payload, byte qos, IVariableHeaderExtraPart extraPart, MessageCallBack messageCallBack) {
+    private void publish(String topic, byte[] payload, byte qos,  MessageCallBack messageCallBack) {
         if (isConnected()) {
             try {
-                int identifier = imRemoteService.publish(topic, payload, qos,extraPart);
+                int identifier = imRemoteService.publish(topic, payload, qos);
                 saveCallBack(identifier, messageCallBack);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -490,8 +490,8 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
     @WorkerThread
     @Override
     public void onRequestSerialized(Publish publish) {
-        PublishHeaderExtraPart publishHeaderExtraPart = new PublishHeaderExtraPart(publish.getCodingType(), publish.getMessageType());
-        publish(publish.getTopic(), (byte[]) publish.getPayload(), defaultQos,publishHeaderExtraPart, publish.getMessageCallBack());
+//        PublishHeaderExtraPart publishHeaderExtraPart = new PublishHeaderExtraPart(publish.getCodingType(), publish.getMessageType());
+        publish(publish.getTopic(), (byte[]) publish.getPayload(), defaultQos, publish.getMessageCallBack());
     }
 
     /**

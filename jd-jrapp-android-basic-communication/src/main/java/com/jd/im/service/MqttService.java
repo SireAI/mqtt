@@ -233,7 +233,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         startTimingWheel();
         connect();
     }
-
+    int i = 0;
     /**
      * 数据到达,发往数据线程队列处理
      *
@@ -241,6 +241,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      */
     @Override
     public void onDataArrived(byte[] data) {
+//        System.out.println("======"+(i++));
         if (dataWorkerSender != null) {
             Message message = dataWorkerSender.obtainMessage();
             message.obj = data;
@@ -468,10 +469,9 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      * @param payload
      * @param qos
      */
-    public int publish(String topic, byte[] payload, byte qos, IVariableHeaderExtraPart extraPart) {
+    public int publish(String topic, byte[] payload, byte qos) {
         int identifier = mqttQos.getIdentifierHelper().getIdentifier();
         MQTTPublish publish = MQTTPublish.newInstance(topic, payload, qos, identifier);
-        publish.setExtraHeaderPart(extraPart);
         sendMessage(publish);
         mqttQos.getIdentifierHelper().addSentPackage(publish);
         return identifier;

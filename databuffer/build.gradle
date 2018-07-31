@@ -1,18 +1,37 @@
 apply plugin: 'com.android.library'
+ext {
+    bintrayRepo = rootProject.ext.maven.bintrayRepo
+    bintrayName = 'databuffer'
 
+    publishedGroupId = rootProject.ext.maven.publishedGroupIdForLib
+    artifact = 'databuffer'
+
+    libraryVersion = '1.0.1-20180725-SNAPSHOT'
+
+    libraryName = 'databuffer'
+    libraryDescription = 'JDJRAPP lib module'
+
+    siteUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
+    gitUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
+
+    developerId = rootProject.ext.maven.developerId
+    developerName = rootProject.ext.maven.developerName
+    developerEmail = rootProject.ext.maven.developerEmail
+
+    allLicenses = rootProject.ext.maven.allLicenses
+    licenseName = rootProject.ext.maven.licenseName
+    licenseUrl =  rootProject.ext.maven.licenseUrl
+}
 android {
     compileSdkVersion 27
+
     buildToolsVersion "27.0.3"
 
-
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 27
+        minSdkVersion 14
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -22,14 +41,13 @@ android {
         }
     }
 
+
+
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:27.1.1'
-    testCompile 'junit:junit:4.12'
-    androidTestCompile('com.android.support.test.espresso:espresso-core:3.0.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-
 }
+
+//apply from: '../publish.gradle'
+apply from: '../maven-install.gradle'

@@ -3,8 +3,11 @@ package com.jd.im.mqtt.messages;
 
 import com.jd.im.mqtt.MQTTHelper;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 
 import static com.jd.im.mqtt.MQTTConstants.PUBACK;
 
@@ -17,7 +20,7 @@ public class MQTTPuback extends MQTTMessage  {
     }
 
     private MQTTPuback(byte[] buffer) {
-
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer);
         int i = 0;
         // Type (just for clarity sake we'll set it...)
         this.setType((byte) ((buffer[i++] >> 4) & 0x0F));
@@ -32,7 +35,6 @@ public class MQTTPuback extends MQTTMessage  {
             multiplier *= 128;
         } while ((digit & 128) != 0);
         this.setRemainingLength(len);
-
         // Get variable header (always length 2 in PUBACK)
         variableHeader = new byte[2];
         System.arraycopy(buffer, i, variableHeader, 0, variableHeader.length);
@@ -42,8 +44,8 @@ public class MQTTPuback extends MQTTMessage  {
         if (payload.length > 0)
             System.arraycopy(buffer, i + variableHeader.length, payload, 0, remainingLength - variableHeader.length);
 
-        // Get package identifier
-        packageIdentifier = (variableHeader[variableHeader.length - 2] >> 8 & 0xFF) | (variableHeader[variableHeader.length - 1] & 0xFF);
+
+        packageIdentifier = new BigInteger(1, variableHeader).intValue();
     }
 
     public static MQTTPuback newInstance(int packageIdentifier) {

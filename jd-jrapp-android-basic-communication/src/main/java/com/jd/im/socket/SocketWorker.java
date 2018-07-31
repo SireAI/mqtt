@@ -83,7 +83,6 @@ import static android.content.ContentValues.TAG;
     private void resetReconnectParam() {
         this.reconnectCount = DEFAULT_REPEAT_COUNT;
     }
-
     /**
      * 监听服务端消息
      */
@@ -92,9 +91,8 @@ import static android.content.ContentValues.TAG;
             // Read from the InputStream
             int len = 0;
             try {
-                len = webSocket.listenServer();
-                byte[] data = webSocket.getData();
-                if (len > 0) {
+                byte[] data = webSocket.listenServer();
+                if (data.length > 0) {
                     if (socketCallBack != null) {
                         socketCallBack.onDataArrived(data);
                     }
@@ -102,7 +100,7 @@ import static android.content.ContentValues.TAG;
                     serverCloseSocket(len);
                 }
             } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, e.getMessage() == null ? "socket closed":e.getMessage());
                 if (socketCallBack != null) {
                     socketCallBack.onSocketFailed(SocketCallBack.SOCKET_READ_EXCPTION, e);
                     break;
@@ -180,10 +178,11 @@ import static android.content.ContentValues.TAG;
      *
      * @param data
      */
-    public void sendData(byte[] data) {
+    public  void sendData(byte[] data) {
         if (webSocket != null && webSocket.isConnected() && !webSocket.isOutputShutdown()) {
             try {
                 webSocket.getOutputStream().write(data);
+                webSocket.getOutputStream().flush();
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
                 if (socketCallBack != null) {

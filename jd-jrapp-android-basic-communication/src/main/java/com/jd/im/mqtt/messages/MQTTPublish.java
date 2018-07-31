@@ -10,6 +10,7 @@ import com.jd.im.storage.Persistentable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 
 import static com.jd.im.mqtt.MQTTConstants.AT_LEAST_ONCE;
 import static com.jd.im.mqtt.MQTTConstants.AT_MOST_ONCE;
@@ -101,7 +102,7 @@ public class MQTTPublish extends MQTTMessage implements Persistentable{
             case AT_LEAST_ONCE:
             case EXACTLY_ONCE:
                 // 2 byte packageIdentifier
-                packageIdentifier = (variableHeader[variableHeader.length - 1]) | (variableHeader[variableHeader.length - 2]);
+                packageIdentifier = new BigInteger(1, variableHeader).intValue();
                 break;
         }
 
