@@ -7,7 +7,7 @@ ext {
     publishedGroupId = rootProject.ext.maven.publishedGroupIdForLib
     artifact = 'mqtt-socket'
 
-    libraryVersion = '1.0.2-201809104-SNAPSHOT'
+    libraryVersion = '1.0.2-201809105-SNAPSHOT'
 
     libraryName = 'mqtt-socket'
     libraryDescription = 'JDJRAPP sh busniess module'
