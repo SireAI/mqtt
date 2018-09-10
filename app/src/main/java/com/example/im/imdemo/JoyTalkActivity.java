@@ -1,5 +1,6 @@
 package com.example.im.imdemo;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -110,6 +111,7 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
 //        testUpload();
 
         testCache();
+        sendBroadcast();
     }
 
     private void testCache() {

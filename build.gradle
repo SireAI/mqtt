@@ -27,9 +27,12 @@ buildscript {
 
         //京东金融私服-正式仓库
         maven{ url 'http://nexus.cbpmgt.com/nexus/content/groups/public' }
+                maven{ url 'http://nexus.cbpmgt.com/nexus/content/repositories/snapshots' }
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
+//        classpath 'com.android.tools.build:gradle:3.1.2'
 
 //        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
@@ -45,8 +48,8 @@ buildscript {
 allprojects {
     repositories {
         maven { url  "https://maven.google.com/" }
-//        maven{ url 'http://nexus.cbpmgt.com/nexus/content/groups/public' }
-//        maven{ url 'http://nexus.cbpmgt.com/nexus/content/repositories/snapshots' }
+        maven{ url 'http://nexus.cbpmgt.com/nexus/content/groups/public' }
+        maven{ url 'http://nexus.cbpmgt.com/nexus/content/repositories/snapshots' }
 //        google()
                 jcenter()
         maven { url "http://artifactory.jd.com/libs-releases-local/" }
