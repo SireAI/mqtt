@@ -65,6 +65,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     private static final String TAG = "MqttService";
     private static final int DATA = 5;
     private static final int RECONNECT = 6;
+    private Object lock = new Object();
     /**
      * 配合超时时间，这个次数大约是半天，正常连续超时重传1小时，如果仍然无法正确应答
      * 那么此类消息服务器可能无法正确应答，丢弃掉
@@ -123,6 +124,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     private ScheduledRetray scheduledRetray;
     private int connectState = STATE_NONE;
     private MessageStore messageStore;
+    private IBinder.DeathRecipient mDeathRecipient;
 
     @Nullable
     @Override
@@ -142,25 +144,62 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     }
 
     @Override
+    public void onRebind(Intent intent) {
+        if(imRemoteService == null){
+            imRemoteService = new IMRemoteServiceImpl(this);
+        }
+        binderLifeCycle();
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
         imRemoteService = new IMRemoteServiceImpl(this);
+        binderLifeCycle();
         mqttQos = new MqttQos(this);
         messageStore = new DatabaseMessageStore(this);
         startDataWorker();
     }
 
+    private void binderLifeCycle() {
+        if(imRemoteService!=null && mDeathRecipient == null){
+            try {
+                mDeathRecipient = new IBinder.DeathRecipient() {
+                    @Override
+                    public void binderDied() {
+                        synchronized (lock){
+                            Log.d(TAG, "binder died. name:" + Thread.currentThread().getName());
+                            if (imRemoteService == null)
+                                return;
+                            imRemoteService.asBinder().unlinkToDeath(this, 0);
+                            imRemoteService = null;
+                            mDeathRecipient = null;
+                        }
+                    }
+                };
+                imRemoteService.asBinder().linkToDeath(mDeathRecipient, 0);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         Log.w(TAG, "服务销毁");
-        stopForeground(true);
+//        stopForeground(true);
         disconnect(true);
         pinSender.release();
         cancelDataWorker();
         stopTimingWheel();
         closeDB();
+        synchronized (lock){
+            if(imRemoteService!=null && mDeathRecipient!=null){
+                imRemoteService.asBinder().unlinkToDeath(mDeathRecipient,0);
+            }
+        }
+        super.onDestroy();
     }
 
     private void closeDB() {
@@ -187,10 +226,8 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
             } else {
                 stopPin();
             }
-            if (connectCallBack != null) {
-
+            if (connectCallBack != null && connectCallBack.asBinder().isBinderAlive()) {
                 connectCallBack.onConnectStateChange(state);
-
             }
         } catch (RemoteException e1) {
             e1.printStackTrace();
@@ -241,7 +278,6 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      */
     @Override
     public void onDataArrived(byte[] data) {
-//        System.out.println("======"+(i++));
         if (dataWorkerSender != null) {
             Message message = dataWorkerSender.obtainMessage();
             message.obj = data;
@@ -303,13 +339,23 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
 
     @Override
-    public void dispatchPush(IMQTTMessage publish) {
+    public  void dispatchPush(IMQTTMessage publish) {
         try {
-            IMLocalService localService = imRemoteService.getLocalService();
-            if (localService != null) {
-                localService.push2Client(publish);
-            } else {
-                Log.w(TAG, "服务端消息到达，但客户端服务未绑定,消息将丢失...");
+
+            if(imRemoteService != null){
+                synchronized (lock){
+                    if(!imRemoteService.asBinder().isBinderAlive()){
+                        imRemoteService.unBindLocalService();
+                    }
+                }
+                IMLocalService localService = imRemoteService.getLocalService();
+                if (localService != null) {
+                    if(localService.asBinder().isBinderAlive()){
+                        localService.push2Client(publish);
+                    }
+                } else {
+                    Log.w(TAG, "服务端消息到达，但客户端服务未绑定,消息将丢失...");
+                }
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -341,20 +387,30 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     }
 
     @Override
-    public void notifyOperationResult(boolean success, int id,byte[] extraInfor) {
+    public  void notifyOperationResult(boolean success, int id,byte[] extraInfor) {
         pinSender.refreshLatestExchangeTime();
         try {
-            IMLocalService localService = imRemoteService.getLocalService();
-            if (localService != null) {
-                localService.operationResult(success, id,extraInfor);
-            } else {
-                Log.w(TAG, "服务端消息到达，但客户端服务未绑定,消息将丢失...");
+            if(imRemoteService != null){
+                synchronized (lock){
+                    if(!imRemoteService.asBinder().isBinderAlive()){
+                        imRemoteService.unBindLocalService();
+                    }
+                }
+                IMLocalService localService = imRemoteService.getLocalService();
+                if (localService != null) {
+                    if(localService.asBinder().isBinderAlive()){
+                        localService.operationResult(success, id,extraInfor);
+                    }
+                } else {
+                    Log.w(TAG, "服务端消息到达，但客户端服务未绑定,消息将丢失...");
+                }
             }
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+
 
     @WorkerThread
     @Override
@@ -764,7 +820,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(startId, new Notification());
+//        startForeground(1000, new Notification());
         return super.onStartCommand(intent, flags, startId);
     }
 

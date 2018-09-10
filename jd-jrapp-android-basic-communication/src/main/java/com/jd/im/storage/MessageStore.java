@@ -25,7 +25,7 @@ public interface MessageStore {
      * @param message
      * @return
      */
-    String storeArrived(String clientHandle, IMQTTMessage message);
+     String storeArrived(String clientHandle, IMQTTMessage message);
 
 
     /**

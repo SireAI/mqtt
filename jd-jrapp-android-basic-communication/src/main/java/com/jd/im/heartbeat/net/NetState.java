@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.annotation.RestrictTo;
+import android.text.TextUtils;
 
 import com.jd.im.utils.Log;
 
@@ -79,7 +80,7 @@ public abstract class NetState extends BroadcastReceiver {
         if (isWifi) {
             WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             WifiInfo wi = wifiManager.getConnectionInfo();
-            if (wi != null && lastWifiInfo != null && lastWifiInfo.getBSSID().equals(wi.getBSSID())
+            if (wi != null && lastWifiInfo != null && !TextUtils.isEmpty(lastWifiInfo.getBSSID()) && lastWifiInfo.getBSSID().equals(wi.getBSSID())
                     && lastWifiInfo.getSSID().equals(wi.getSSID())
                     && lastWifiInfo.getNetworkId() == wi.getNetworkId()) {
                 Log.w(TAG, "Same Wifi, do not NetworkChanged");

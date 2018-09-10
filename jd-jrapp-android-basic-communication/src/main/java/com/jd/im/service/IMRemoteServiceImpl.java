@@ -1,5 +1,6 @@
 package com.jd.im.service;
 
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.RestrictTo;
 
@@ -22,6 +23,8 @@ import com.jd.im.utils.Log;
  class IMRemoteServiceImpl extends IMRemoteService.Stub {
     private final MqttService mqttService;
     private IMLocalService localService;
+    private static final String TAG = "IMRemoteServiceImpl";
+    private DeathRecipient mDeathRecipient;
 
 
     public IMRemoteServiceImpl(MqttService mqttService) {
@@ -79,13 +82,35 @@ import com.jd.im.utils.Log;
     }
 
     @Override
-    public void bindLocalService(IMLocalService localService) throws RemoteException {
+    public synchronized void bindLocalService(IMLocalService localService) throws RemoteException {
         this.localService = localService;
+        try {
+            if(localService!=null && mDeathRecipient == null)
+            mDeathRecipient = new IBinder.DeathRecipient() {
+                @Override
+                public void binderDied() {
+                        Log.d(TAG, "binder died. name:" + Thread.currentThread().getName());
+                        if (IMRemoteServiceImpl.this.localService == null)
+                            return;
+                    IMRemoteServiceImpl.this.localService.asBinder().unlinkToDeath(this, 0);
+                    IMRemoteServiceImpl.this.localService = null;
+                    mDeathRecipient = null;
+                }
+            };
+            localService.asBinder().linkToDeath(mDeathRecipient, 0);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
+
     @Override
-    public void unBindLocalService() throws RemoteException {
+    public synchronized void unBindLocalService() throws RemoteException {
+        if(this.localService!=null && mDeathRecipient!=null){
+            this.localService.asBinder().unlinkToDeath(mDeathRecipient,0);
+        }
         this.localService = null;
+        this.mDeathRecipient = null;
     }
     @Override
     public IMLocalService getLocalService() {

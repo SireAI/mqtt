@@ -11,10 +11,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <application android:hardwareAccelerated="false">
+    <application >
         <service android:name=".service.MqttService"
-            android:process=":im_service"
+            android:process=":mqtt_service"
             android:priority = "1000"
+            android:enabled="true"
             />
     </application>
 </manifest>

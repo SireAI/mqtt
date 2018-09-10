@@ -32,21 +32,23 @@ public class RestoreDataAction implements Runnable {
         MessageStore databaseMessageStore = mqttService.getMessageStore();
         if(databaseMessageStore == null)return;
         Iterator<IMQTTMessage> allArrivedMessages = databaseMessageStore.getAllArrivedMessages(mqttService.getClientHandle());
-        while (allArrivedMessages.hasNext()) {
-            IMQTTMessage message = allArrivedMessages.next();
-            if (message == null) continue;
-            try {
-                boolean exist = mqttService.getEventTimingWheel().hasEvent(message.getPackageIdentifier());
-                if(!exist){
-                    mqttService.getMqttQos().getIdentifierHelper().addSentPackage((MQTTMessage) message);
-                    if(message instanceof Persistentable){
-                        ((Persistentable) message).setPersistent();
+        if(allArrivedMessages!=null){
+            while (allArrivedMessages.hasNext()) {
+                IMQTTMessage message = allArrivedMessages.next();
+                if (message == null) continue;
+                try {
+                    boolean exist = mqttService.getEventTimingWheel().hasEvent(message.getPackageIdentifier());
+                    if(!exist){
+                        mqttService.getMqttQos().getIdentifierHelper().addSentPackage((MQTTMessage) message);
+                        if(message instanceof Persistentable){
+                            ((Persistentable) message).setPersistent();
+                        }
+                        mqttService.sendMessage(message);
+                        Log.d(TAG, "类型" + MQTTHelper.decodePackageName(message.getType()) + ",id" + message.getPackageIdentifier() + "已经恢复...");
                     }
-                    mqttService.sendMessage(message);
-                    Log.d(TAG, "类型" + MQTTHelper.decodePackageName(message.getType()) + ",id" + message.getPackageIdentifier() + "已经恢复...");
+                } catch (RemoteException e) {
+                    e.printStackTrace();
                 }
-            } catch (RemoteException e) {
-                e.printStackTrace();
             }
         }
     }

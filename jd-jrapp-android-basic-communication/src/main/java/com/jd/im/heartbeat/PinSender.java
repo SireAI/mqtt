@@ -82,8 +82,8 @@ public class PinSender implements PinDetecter.PinDetectCallBack, Alarm.ICallBack
         if (pinTaskWrapper != null) {
             pinTaskWrapper = null;
         }
-        if (pinDetecter != null && context != null) {
-            pinDetecter.release(context);
+        if (pinDetecter != null ) {
+            pinDetecter.release();
             pinDetecter = null;
             context = null;
         }

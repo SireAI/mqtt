@@ -57,6 +57,7 @@ public class PinDetecter {
      * 心跳间隔失败后的重试次数
      */
     private static final int HEAT_FAILED_ATEMPT_COUNT = 3;
+    private  Context mContext;
     /**
      * 心跳探测期增加步长
      */
@@ -155,6 +156,7 @@ public class PinDetecter {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         context.registerReceiver(netState, filter);
+        this.mContext = context;
     }
 
     public int getFixedHeartInterval() {
@@ -353,9 +355,14 @@ public class PinDetecter {
         }
     }
 
-    public void release(Context context) {
+    public void release() {
         if (netState != null) {
-            context.unregisterReceiver(netState);
+            try {
+                mContext.unregisterReceiver(netState);
+                mContext = null;
+            }catch (Exception e){
+//                Log.e(TAG,e.getMessage());
+            }
         }
     }
 

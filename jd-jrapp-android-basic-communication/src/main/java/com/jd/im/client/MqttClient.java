@@ -93,6 +93,7 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
      */
     private PushCallBack callBack;
     private ModeListener modeListener;
+    private boolean isBind;
 
 
     private MqttClient(Context context, Converter.Factory dataConverter, byte qos, boolean openLog, PushCallBack pushCallBack, OutputCallBack defaultOperateCallBack) {
@@ -149,14 +150,17 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
             if (imRemoteService != null) {
                 //绑定本地服务
                 imRemoteService.bindLocalService(imLocalService);
+                isBind = true;
                 if(openLog){
                     Log.openLog();
                     imRemoteService.openLog();
                 }
             }
             tryReconnect();
+
         } catch (Exception e) {
             imRemoteService = null;
+            isBind = false;
         }
     }
 
@@ -174,6 +178,7 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
+        isBind = false;
         //如果在初始连接或者连接中断开，重试重启
         if (connectState == STATE_CONNECTING || connectState == STATE_CONNECTED) {
             restartService();
@@ -198,21 +203,28 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
      * @return
      */
     private boolean checkServiceActive() {
-        if (imRemoteService == null) {
-            Log.d(TAG, "try to bind remote  remoteService");
-            Intent intent = new Intent(app, MqttService.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                app.startForegroundService(intent);
-            } else {
+        try {
+            if (imRemoteService == null) {
+                Log.d(TAG, "try to bind remote  remoteService");
+                Intent intent = new Intent(app, MqttService.class);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    app.startForegroundService(intent);
+//                } else {
+//                    app.startService(intent);
+//                }
                 app.startService(intent);
+
+                if (!app.bindService(intent, this, Service.BIND_AUTO_CREATE)) {
+                    Log.e(TAG, "remote  remoteService bind failed");
+                }
+                return false;
             }
-            if (!app.bindService(intent, this, Service.BIND_AUTO_CREATE)) {
-                Log.e(TAG, "remote  remoteService bind failed");
-            }
+            Log.d(TAG, "remote  remoteService bind success");
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
             return false;
         }
-        Log.d(TAG, "remote  remoteService bind success");
-        return true;
     }
 
     /**
@@ -266,6 +278,7 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
     private void disconnect(boolean tryReconnect) {
         if (connectState == STATE_CONNECTED) {
             if (imRemoteService != null) {
+
                 try {
                     imRemoteService.disConnect(tryReconnect);
                 } catch (RemoteException e) {
@@ -274,6 +287,20 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
             }
         } else {
             Log.e(TAG, "服务未连接");
+        }
+        try {
+            if(isBind){
+                if(imRemoteService!=null){
+                    imRemoteService.unBindLocalService();
+                }
+                this.app.unbindService(this);
+                isBind = false;
+            }
+            Intent intent = new Intent(app, MqttService.class);
+            this.app.stopService(intent);
+            imRemoteService = null;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -294,18 +321,20 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
     }
 
     private void saveCallBack(int identifier, MessageCallBack messageCallBack) {
-        if (messageCallBack != null) {
+        if (messageCallBack != null && tokenManager!=null) {
             tokenManager.put(identifier, messageCallBack);
         }
     }
 
     public void subscribe(String[] topics, byte[] qoss, MessageCallBack messageCallBack) {
         if (isConnected()) {
-            try {
-                int id = imRemoteService.subscribe(topics, qoss);
-                saveCallBack(id, messageCallBack);
-            } catch (RemoteException e) {
-                e.printStackTrace();
+            if(imRemoteService!=null){
+                try {
+                    int id = imRemoteService.subscribe(topics, qoss);
+                    saveCallBack(id, messageCallBack);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
         }else {
             if(messageCallBack!=null){
@@ -473,13 +502,17 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
     @MainThread
     @Override
     public void onOperationCallBack(boolean success, int id, Object extraInfor) {
-        MessageCallBack messageCallBack = tokenManager.get(id);
-        if (success) {
-            messageCallBack.onSuccess(extraInfor);
-        } else {
-            messageCallBack.onFailed(new MQTTException("连接断开或操作超时..."));
+        if(tokenManager!=null){
+            MessageCallBack messageCallBack = tokenManager.get(id);
+            if(messageCallBack!=null){
+                if (success) {
+                    messageCallBack.onSuccess(extraInfor);
+                } else {
+                    messageCallBack.onFailed(new MQTTException("连接断开或操作超时..."));
+                }
+            }
+            tokenManager.remove(id);
         }
-        tokenManager.remove(id);
     }
 
     /**
@@ -508,10 +541,12 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
 
     @Override
     public void notifyAppMode(int mode) {
-        if (imRemoteService != null) {
+        if (imRemoteService != null && isBind) {
             try {
-                imRemoteService.modeEvent(mode);
-            } catch (RemoteException e) {
+                if(imRemoteService.asBinder().isBinderAlive()){
+                    imRemoteService.modeEvent(mode);
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {

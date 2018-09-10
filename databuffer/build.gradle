@@ -1,27 +1,27 @@
 apply plugin: 'com.android.library'
-ext {
-    bintrayRepo = rootProject.ext.maven.bintrayRepo
-    bintrayName = 'databuffer'
-
-    publishedGroupId = rootProject.ext.maven.publishedGroupIdForLib
-    artifact = 'databuffer'
-
-    libraryVersion = '1.0.1-20180725-SNAPSHOT'
-
-    libraryName = 'databuffer'
-    libraryDescription = 'JDJRAPP lib module'
-
-    siteUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
-    gitUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
-
-    developerId = rootProject.ext.maven.developerId
-    developerName = rootProject.ext.maven.developerName
-    developerEmail = rootProject.ext.maven.developerEmail
-
-    allLicenses = rootProject.ext.maven.allLicenses
-    licenseName = rootProject.ext.maven.licenseName
-    licenseUrl =  rootProject.ext.maven.licenseUrl
-}
+//ext {
+//    bintrayRepo = rootProject.ext.maven.bintrayRepo
+//    bintrayName = 'databuffer'
+//
+//    publishedGroupId = rootProject.ext.maven.publishedGroupIdForLib
+//    artifact = 'databuffer'
+//
+//    libraryVersion = '1.0.1-20180725-SNAPSHOT'
+//
+//    libraryName = 'databuffer'
+//    libraryDescription = 'JDJRAPP lib module'
+//
+//    siteUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
+//    gitUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
+//
+//    developerId = rootProject.ext.maven.developerId
+//    developerName = rootProject.ext.maven.developerName
+//    developerEmail = rootProject.ext.maven.developerEmail
+//
+//    allLicenses = rootProject.ext.maven.allLicenses
+//    licenseName = rootProject.ext.maven.licenseName
+//    licenseUrl =  rootProject.ext.maven.licenseUrl
+//}
 android {
     compileSdkVersion 27
 
@@ -46,8 +46,8 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:27.1.1'
+    provided 'com.android.support:appcompat-v7:27.1.1'
 }
 
-//apply from: '../publish.gradle'
-apply from: '../maven-install.gradle'
+apply from: '../publish.gradle'
+//apply from: '../maven-install.gradle'

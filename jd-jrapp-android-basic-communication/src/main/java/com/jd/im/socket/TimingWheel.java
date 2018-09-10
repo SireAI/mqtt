@@ -97,10 +97,15 @@ public class TimingWheel<E extends SlotElement> {
         if (shutdown.get()) {  
             throw new IllegalStateException("Cannot be started once stopped");  
         }  
-  
-        if (workerThread!=null&&!workerThread.isAlive()) {
-            workerThread.start();  
-        }  
+        try {
+            //Android开发中，对线程的操作比较悲催，start一个线程后，必须将标识位置false后过一段时间才会停止。当我们再次用到线程的时候，不管Thread.isAlive()返回的是true还是false，如果我们再次Thread.start()，就会出现 java.lang.IllegalThreadStateException: Thread already started的异常。如果想让线程再次跑起来，可以调用线程的run方法：Thread.run().在调用之前别忘了将标志位置为true。
+            if (workerThread!=null&&!workerThread.isAlive()) {
+                workerThread.start();
+            }
+        }catch (Exception e){
+           e.printStackTrace();
+        }
+
     }
 
     public void setFreeze(boolean freeze) {

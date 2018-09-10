@@ -95,6 +95,12 @@ public class NetworkSignalStrength extends PhoneStateListener {
                 e.printStackTrace();
             }
         }
+        if(level>=5){
+            level = 4;
+        }
+        if(level<0){
+            level = 0;
+        }
         if(strength != level){
             Log.d(TAG,"wifi signal strength:"+leves[level]);
             strength = level;

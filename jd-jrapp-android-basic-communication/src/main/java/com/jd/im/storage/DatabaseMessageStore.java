@@ -9,20 +9,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.RemoteException;
 import android.support.annotation.RestrictTo;
 
-import com.jd.im.utils.Log;
-
-
 import com.jd.im.IMQTTMessage;
 import com.jd.im.mqtt.messages.MQTTPublish;
 import com.jd.im.mqtt.messages.MQTTSubscribe;
 import com.jd.im.mqtt.messages.MQTTUnsubscribe;
+import com.jd.im.utils.Log;
 
 import java.util.Iterator;
 
 import static android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE;
 import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
 import static com.jd.im.mqtt.MQTTConstants.SUBSCRIBE;
-import static com.jd.im.mqtt.MQTTConstants.UNSUBACK;
 import static com.jd.im.mqtt.MQTTConstants.UNSUBSCRIBE;
 
 
@@ -57,10 +54,14 @@ public class DatabaseMessageStore implements MessageStore {
 
 
     @Override
-    public String storeArrived(String clientHandle, IMQTTMessage message) {
+    public synchronized String storeArrived(String clientHandle, IMQTTMessage message) {
         Log.d(TAG, "storeArrived{" + clientHandle + "}, {" + message.toString() + "}");
-        db = mqttDb.getWritableDatabase();
+        db = getWritableDatabase();
+
         String id = null;
+        if (db == null) {
+            return id;
+        }
         try {
             ContentValues values = new ContentValues();
             values.put(ID, id = message.getPackageIdentifier() + clientHandle);
@@ -68,7 +69,9 @@ public class DatabaseMessageStore implements MessageStore {
             values.put(TYPE, (int) message.getType());
             values.put(CONTENTS, message.get());
             values.put(MTIMESTAMP, System.currentTimeMillis());
-            db.insertWithOnConflict(MQTT_MESSAGE_TABLE, null, values, CONFLICT_REPLACE);
+            if (db.isOpen()) {
+                db.insertWithOnConflict(MQTT_MESSAGE_TABLE, null, values, CONFLICT_REPLACE);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
             id = null;
@@ -76,17 +79,31 @@ public class DatabaseMessageStore implements MessageStore {
         return id;
     }
 
+    private SQLiteDatabase getWritableDatabase() {
+        try {
+            return mqttDb.getWritableDatabase();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     @Override
-    public boolean discardArrived(String clientHandle, String id) {
+    public synchronized boolean discardArrived(String clientHandle, String id) {
         Log.d(TAG, "discardArrived{" + clientHandle + "}, {" + id + "}");
-        db = mqttDb.getWritableDatabase();
+        db = getWritableDatabase();
+        if (db == null) {
+            return false;
+        }
         String[] selectionArgs = {id + clientHandle};
-        int rows;
+        int rows = 0;
         try {
-            rows = db.delete(MQTT_MESSAGE_TABLE,
-                    ID + "=? ",
-                    selectionArgs);
+            if (db.isOpen()) {
+                rows = db.delete(MQTT_MESSAGE_TABLE,
+                        ID + "=? ",
+                        selectionArgs);
+            }
         } catch (SQLException e) {
             Log.e(TAG, "discardArrived", e);
             throw e;
@@ -102,37 +119,39 @@ public class DatabaseMessageStore implements MessageStore {
 
 
     @Override
-    public Iterator<IMQTTMessage> getAllArrivedMessages(final String clientHandle) {
+    public synchronized Iterator<IMQTTMessage> getAllArrivedMessages(final String clientHandle) {
         return new Iterator<IMQTTMessage>() {
             private final String[] selectionArgs = {clientHandle};
             private Cursor cursor;
             private boolean hasNext;
 
             {
-                db = mqttDb.getWritableDatabase();
-                if (clientHandle == null) {
-                    cursor = db.query(MQTT_MESSAGE_TABLE,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            MTIMESTAMP+" ASC");
-                } else {
-                    cursor = db.query(MQTT_MESSAGE_TABLE,
-                            null,
-                            CLIENT_HANDLE + "=?",
-                            selectionArgs,
-                            null,
-                            null,
-                            MTIMESTAMP+" ASC");
+                db = getWritableDatabase();
+                if (db != null) {
+                    if (clientHandle == null) {
+                        cursor = db.query(MQTT_MESSAGE_TABLE,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                MTIMESTAMP + " ASC");
+                    } else {
+                        cursor = db.query(MQTT_MESSAGE_TABLE,
+                                null,
+                                CLIENT_HANDLE + "=?",
+                                selectionArgs,
+                                null,
+                                null,
+                                MTIMESTAMP + " ASC");
+                    }
+                    hasNext = cursor.moveToFirst();
                 }
-                hasNext = cursor.moveToFirst();
             }
 
             @Override
             public boolean hasNext() {
-                if (!hasNext) {
+                if (!hasNext && cursor != null) {
                     cursor.close();
                 }
                 return hasNext;
@@ -173,26 +192,29 @@ public class DatabaseMessageStore implements MessageStore {
     }
 
     @Override
-    public void clearArrivedMessages(String clientHandle) {
+    public synchronized void clearArrivedMessages(String clientHandle) {
 
-        db = mqttDb.getWritableDatabase();
-        String[] selectionArgs = {clientHandle};
-        int rows = 0;
-        if (clientHandle == null) {
-            Log.d(TAG, "clearArrivedMessages: clearing the table");
-            rows = db.delete(MQTT_MESSAGE_TABLE, null, null);
-        } else {
-            Log.d(TAG, "clearArrivedMessages: clearing the table of " + clientHandle + " messages");
-            rows = db.delete(MQTT_MESSAGE_TABLE,
-                    CLIENT_HANDLE + "=?",
-                    selectionArgs);
+        db = getWritableDatabase();
+        if ( db !=null && db.isOpen()) {
+            String[] selectionArgs = {clientHandle};
+            int rows = 0;
+            if (clientHandle == null) {
+                Log.d(TAG, "clearArrivedMessages: clearing the table");
+                rows = db.delete(MQTT_MESSAGE_TABLE, null, null);
+            } else {
+                Log.d(TAG, "clearArrivedMessages: clearing the table of " + clientHandle + " messages");
+                rows = db.delete(MQTT_MESSAGE_TABLE,
+                        CLIENT_HANDLE + "=?",
+                        selectionArgs);
 
+            }
+            Log.d(TAG, "clearArrivedMessages: rows affected = " + rows);
         }
-        Log.d(TAG, "clearArrivedMessages: rows affected = " + rows);
+
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         if (this.db != null) {
             this.db.close();
         }
@@ -252,6 +274,4 @@ public class DatabaseMessageStore implements MessageStore {
             Log.d(TAG, "onUpgrade complete");
         }
     }
-
-
 }
