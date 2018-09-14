@@ -56,10 +56,10 @@ public class DatabaseMessageStore implements MessageStore {
     @Override
     public synchronized String storeArrived(String clientHandle, IMQTTMessage message) {
         Log.d(TAG, "storeArrived{" + clientHandle + "}, {" + message.toString() + "}");
-        db = getWritableDatabase();
+        db = getDatabase();
 
         String id = null;
-        if (db == null) {
+        if (db == null || !db.isOpen()) {
             return id;
         }
         try {
@@ -92,8 +92,8 @@ public class DatabaseMessageStore implements MessageStore {
     @Override
     public synchronized boolean discardArrived(String clientHandle, String id) {
         Log.d(TAG, "discardArrived{" + clientHandle + "}, {" + id + "}");
-        db = getWritableDatabase();
-        if (db == null) {
+        db = getDatabase();
+        if (db == null || !db.isOpen()) {
             return false;
         }
         String[] selectionArgs = {id + clientHandle};
@@ -126,8 +126,8 @@ public class DatabaseMessageStore implements MessageStore {
             private boolean hasNext;
 
             {
-                db = getWritableDatabase();
-                if (db != null) {
+                db = getDatabase();
+                if (db != null && db.isOpen()) {
                     if (clientHandle == null) {
                         cursor = db.query(MQTT_MESSAGE_TABLE,
                                 null,
@@ -191,10 +191,20 @@ public class DatabaseMessageStore implements MessageStore {
         };
     }
 
+    private SQLiteDatabase getDatabase() {
+        try {
+            return getWritableDatabase();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     @Override
     public synchronized void clearArrivedMessages(String clientHandle) {
 
-        db = getWritableDatabase();
+        db = getDatabase();
         if ( db !=null && db.isOpen()) {
             String[] selectionArgs = {clientHandle};
             int rows = 0;

@@ -246,16 +246,19 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         sendTask(new Runnable() {
             @Override
             public void run() {
-                if (type == SocketCallBack.CONNECT_EXCEPTION) {
-                    //长链建立失败
-                    notifyConnectState(STATE_CONNECTION_FAILED);
-                    reconnect();
-                } else if (type == SocketCallBack.SOCKET_READ_EXCPTION || type == SocketCallBack.SOCKET_WRITE_EXCPTION) {
-                    //长链建立后交互失败，重新初始化
-                    pinSender.getPinDetecter().onSocketFailed();
-                    disconnect(false);
-                    reconnect();
+                if(pinSender!=null){
+                    if (type == SocketCallBack.CONNECT_EXCEPTION) {
+                        //长链建立失败
+                        notifyConnectState(STATE_CONNECTION_FAILED);
+                        reconnect();
+                    } else if (type == SocketCallBack.SOCKET_READ_EXCPTION || type == SocketCallBack.SOCKET_WRITE_EXCPTION) {
+                        //长链建立后交互失败，重新初始化
+                        pinSender.getPinDetecter().onSocketFailed();
+                        disconnect(false);
+                        reconnect();
+                    }
                 }
+
             }
         });
     }
@@ -487,7 +490,9 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
     @Override
     public boolean onScheduleRetray() {
-        if (isServiceOutage()) {
+        if(pinSender == null){
+            return false;
+        }else if(isServiceOutage()){
             reconnect();
         }
         return true;
@@ -611,7 +616,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     }
 
     private synchronized void reconnect() {
-        if (automaticReconnect) {
+        if (automaticReconnect && pinSender!=null) {
             final RetrayParam retrayParam = pinSender.getPinDetecter().getRetrayParam();
             if (!isReconnectActionRunning()) {
                 if (retrayParam.getRepeatCount() > 0) {
@@ -851,7 +856,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
     public void setMode(int mode) {
         //切换前台，网络正常，非连接状态，将尝试重连一次
-        if (isServiceOutage()) {
+        if (isServiceOutage() && pinSender!=null) {
             if (mode == ACTIVE_MODE) {
                 //固定为活跃态
                 pinSender.getPinDetecter().changeEvent(ACTIVE_MODE);
