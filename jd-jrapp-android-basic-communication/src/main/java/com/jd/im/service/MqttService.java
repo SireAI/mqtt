@@ -194,6 +194,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         cancelDataWorker();
         stopTimingWheel();
         closeDB();
+        cancelSheduleRetray();
         synchronized (lock){
             if(imRemoteService!=null && mDeathRecipient!=null){
                 imRemoteService.asBinder().unlinkToDeath(mDeathRecipient,0);
@@ -223,6 +224,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
                 if (connectOptions != null && !connectOptions.isCleanSession()) {
                     resumeData();
                 }
+                cancelSheduleRetray();
             } else {
                 stopPin();
             }
@@ -370,13 +372,14 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
         Log.d(TAG, "pin received by the time " + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()));
         //处于一次重试的连接
-        RetrayParam retrayParam = pinSender.getPinDetecter().getRetrayParam();
-        if (retrayParam.hasRetried()) {
-            retrayParam.reset();
-        }
-        if (pinSender != null) {
+        if(pinSender!=null){
+            RetrayParam retrayParam = pinSender.getPinDetecter().getRetrayParam();
+            if (retrayParam.hasRetried()) {
+                retrayParam.reset();
+            }
             pinSender.getPinDetecter().pinReceivedProcess();
         }
+
     }
 
     @Override
@@ -636,15 +639,25 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
                 } else {
                     retrayParam.reset();
                     Log.d(TAG, "尝试重新建立长连接" + retrayParam.getDefaultRepeatCount() + "次失败...");
-                    if (scheduledRetray == null) {
-                        scheduledRetray = new ScheduledRetray(this, this);
-
-                    }
-                    scheduledRetray.checkCondition(this);
+                   startScheduleRetray();
                 }
             }
         } else {
             Log.d(TAG, "链接不会重试");
+        }
+    }
+
+    public void startScheduleRetray(){
+        if (scheduledRetray == null) {
+            scheduledRetray = new ScheduledRetray(this, this);
+        }
+        scheduledRetray.checkCondition(this);
+    }
+
+    public void cancelSheduleRetray(){
+        if(scheduledRetray!=null){
+            scheduledRetray.cancel();
+            scheduledRetray = null;
         }
     }
 
@@ -734,8 +747,8 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     private void cancelDataWorker() {
         if (dataWorker != null) {
             dataWorkerSender.removeCallbacksAndMessages(null);
-            dataWorkerSender = null;
             dataWorker.quit();
+            dataWorkerSender = null;
             dataWorker = null;
         }
     }
@@ -856,14 +869,16 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
     public void setMode(int mode) {
         //切换前台，网络正常，非连接状态，将尝试重连一次
-        if (isServiceOutage() && pinSender!=null) {
-            if (mode == ACTIVE_MODE) {
-                //固定为活跃态
-                pinSender.getPinDetecter().changeEvent(ACTIVE_MODE);
-                reconnect();
+        if(pinSender!=null){
+            if (isServiceOutage()) {
+                if (mode == ACTIVE_MODE) {
+                    //固定为活跃态
+                    pinSender.getPinDetecter().changeEvent(ACTIVE_MODE);
+                    reconnect();
+                }
+            } else {
+                pinSender.getPinDetecter().changeEvent(mode);
             }
-        } else {
-            pinSender.getPinDetecter().changeEvent(mode);
         }
     }
 

@@ -44,10 +44,10 @@ dependencies {
         exclude group: 'android.arch.lifecycle'
     }
     //    compile project(':jd-jrapp-android-protobuffer-converter')
-    //    compile project(':jd-jrapp-android-basic-communication')
+        compile project(':jd-jrapp-android-basic-communication')
     //        implementation 'com.sire:protobuffer-converter:1.0.1'
     //        implementation 'com.sire:jd-im:1.0.1'
-//    compile project(':jd-jrapp-bm-message')
+    compile project(':jd-jrapp-bm-message')
     //    implementation 'com.android.support:support-v4:23.2.1'
         debugCompile 'com.amitshekhar.android:debug-db:1.0.4'
     //    compile 'com.jingdong.wireless.libs:jd_shooter:1.0.5'

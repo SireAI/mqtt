@@ -24,6 +24,7 @@ public class ScheduledRetray implements Alarm.ICallBack {
     private  Context context;
     private ICallBack callBack;
     private static final int SCHEDULED_INTERVAL = 10 * 60 * 1000;
+    private int SCHEDULED_ID;
 
     public ScheduledRetray(Context context,ICallBack callBack) {
         this.callBack = callBack;
@@ -40,9 +41,15 @@ public class ScheduledRetray implements Alarm.ICallBack {
     }
 
     public void scheduledConnect(Context context) {
-        boolean success = Alarm.start(new Random().nextInt(1000), SCHEDULED_INTERVAL, context, this);
+        boolean success = Alarm.start(SCHEDULED_ID = new Random().nextInt(1000), SCHEDULED_INTERVAL, context, this);
         if(!success){
             scheduledConnect(context);
+        }
+    }
+
+    public void cancel(){
+        if(context!=null){
+            Alarm.stop(SCHEDULED_ID,context);
         }
     }
 

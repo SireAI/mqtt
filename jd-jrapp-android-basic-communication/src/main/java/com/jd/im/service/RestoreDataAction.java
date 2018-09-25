@@ -1,6 +1,9 @@
 package com.jd.im.service;
 
 import android.os.RemoteException;
+
+import com.jd.im.socket.Event;
+import com.jd.im.socket.TimingWheel;
 import com.jd.im.utils.Log;
 
 import com.jd.im.IMQTTMessage;
@@ -35,9 +38,10 @@ public class RestoreDataAction implements Runnable {
         if(allArrivedMessages!=null){
             while (allArrivedMessages.hasNext()) {
                 IMQTTMessage message = allArrivedMessages.next();
-                if (message == null) continue;
+                TimingWheel<Event<MqttSenderAction>> eventTimingWheel = mqttService.getEventTimingWheel();
+                if (message == null || eventTimingWheel == null) continue;
                 try {
-                    boolean exist = mqttService.getEventTimingWheel().hasEvent(message.getPackageIdentifier());
+                    boolean exist = eventTimingWheel.hasEvent(message.getPackageIdentifier());
                     if(!exist){
                         mqttService.getMqttQos().getIdentifierHelper().addSentPackage((MQTTMessage) message);
                         if(message instanceof Persistentable){

@@ -18,7 +18,7 @@ import static com.jd.im.mqtt.MQTTConstants.EXACTLY_ONCE;
 import static com.jd.im.mqtt.MQTTConstants.PUBLISH;
 
 
-public class MQTTPublish extends MQTTMessage implements Persistentable{
+public class MQTTPublish extends MQTTMessage implements Persistentable {
 
     private boolean dup;
     private byte QoS;
@@ -83,8 +83,13 @@ public class MQTTPublish extends MQTTMessage implements Persistentable{
                 // 2 byte packageIdentifier
                 variableHeader = new byte[len + 2 + 2];
                 break;
+            default:
+                variableHeader = new byte[len + 2];
         }
-
+        //如果出现此类情况，原因可能是流中的首尾标记切分出现问题
+        if ((buffer.length - i) < variableHeader.length) {
+            return;
+        }
         System.arraycopy(buffer, i, variableHeader, 0, variableHeader.length);
         i += variableHeader.length;
 
@@ -175,7 +180,7 @@ public class MQTTPublish extends MQTTMessage implements Persistentable{
             out.write(MQTTHelper.LSB(packageIdentifier));
         }
         //extra
-        if(extraHeaderPart !=null){
+        if (extraHeaderPart != null) {
             try {
                 byte[] bytes = extraHeaderPart.extraVariableHeaderPart();
                 out.write(bytes);
@@ -236,6 +241,7 @@ public class MQTTPublish extends MQTTMessage implements Persistentable{
     public void setExtraHeaderPart(IVariableHeaderExtraPart extraHeaderPart) {
         this.extraHeaderPart = extraHeaderPart;
     }
+
     @Override
     public boolean isPersistent() {
         return persistent;

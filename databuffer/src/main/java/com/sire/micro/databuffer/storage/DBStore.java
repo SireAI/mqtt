@@ -63,79 +63,102 @@ public class DBStore implements IStore {
     @Override
     public void insert(int topic, int maxSize, long expiredTime) {
         Log.d(TAG, "insert{ topic = " + topic + ", maxSize = " + maxSize + "}, {expiredTime = " + expiredTime + "}");
-        db = dataCacheHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(TOPIC, topic);
-        values.put(MAXSIZE, maxSize);
-        values.put(EXPIRED_TIME, expiredTime);
-        db.insertWithOnConflict(DATA_TOPIC, null, values, CONFLICT_REPLACE);
+        db = getDB();
+        if(db!=null && db.isOpen()){
+            ContentValues values = new ContentValues();
+            values.put(TOPIC, topic);
+            values.put(MAXSIZE, maxSize);
+            values.put(EXPIRED_TIME, expiredTime);
+            db.insertWithOnConflict(DATA_TOPIC, null, values, CONFLICT_REPLACE);
+        }
+    }
+
+    private SQLiteDatabase getDB() {
+        try {
+            return dataCacheHelper.getWritableDatabase();
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
     public void insert(CacheEntry cacheEntry) {
         Log.d(TAG, "insert{" + cacheEntry.getTopic() + ":" + cacheEntry.getKey() + "}, {" + cacheEntry.toString() + "}");
-        db = dataCacheHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(ID, cacheEntry.getTopic() + cacheEntry.getKey());
-        values.put(TOPIC, cacheEntry.getTopic());
-        values.put(KEY, cacheEntry.getKey());
-        values.put(VALUE_TYPE, cacheEntry.getValueType());
-        values.put(VALUE, cacheEntry.getValue());
-        values.put(CACHE_TIME, System.currentTimeMillis());
-        db.insertWithOnConflict(DATA_CACHE_TABLE, null, values, CONFLICT_REPLACE);
+        db = getDB();
+        if(db!=null&& db.isOpen()){
+            ContentValues values = new ContentValues();
+            values.put(ID, cacheEntry.getTopic() + cacheEntry.getKey());
+            values.put(TOPIC, cacheEntry.getTopic());
+            values.put(KEY, cacheEntry.getKey());
+            values.put(VALUE_TYPE, cacheEntry.getValueType());
+            values.put(VALUE, cacheEntry.getValue());
+            values.put(CACHE_TIME, System.currentTimeMillis());
+            db.insertWithOnConflict(DATA_CACHE_TABLE, null, values, CONFLICT_REPLACE);
+        }
     }
 
     @Override
     public void delete(int topic, String key) {
         Log.d(TAG, "delete{" + topic + ":" + key + "}");
-        db = dataCacheHelper.getWritableDatabase();
-        String[] selectionArgs = {topic + key};
-        int rows = 0;
-        try {
-            rows = db.delete(DATA_CACHE_TABLE,
-                    ID + "=? ",
-                    selectionArgs);
-        } catch (SQLException e) {
-            Log.e(TAG, "delete", e);
+        db = getDB();
+        if(db!=null&& db.isOpen()){
+            String[] selectionArgs = {topic + key};
+            int rows = 0;
+            try {
+                rows = db.delete(DATA_CACHE_TABLE,
+                        ID + "=? ",
+                        selectionArgs);
+            } catch (SQLException e) {
+                Log.e(TAG, "delete", e);
+            }
+            if (rows != 1) {
+                Log.e(TAG,
+                        "deleteArrived - Error deleting message {" + key
+                                + "} from database: Rows affected = " + rows);
+            }
         }
-        if (rows != 1) {
-            Log.e(TAG,
-                    "deleteArrived - Error deleting message {" + key
-                            + "} from database: Rows affected = " + rows);
-        }
+
     }
 
     @Override
     public void delete(final int topic) {
         Log.d(TAG, "delete{" +  "topic:" + topic + "}");
-        db = dataCacheHelper.getWritableDatabase();
-        TransitionUtils.transition(db, new Runnable() {
-            @Override
-            public void run() {
-                db.delete(DATA_TOPIC, TOPIC + "=?", new String[]{topic + ""});
-                db.delete(DATA_CACHE_TABLE, TOPIC + "=?", new String[]{topic + ""});
-            }
-        });
+        db = getDB();
+        if(db!=null&& db.isOpen()){
+            TransitionUtils.transition(db, new Runnable() {
+                @Override
+                public void run() {
+                    db.delete(DATA_TOPIC, TOPIC + "=?", new String[]{topic + ""});
+                    db.delete(DATA_CACHE_TABLE, TOPIC + "=?", new String[]{topic + ""});
+                }
+            });
+        }
+
     }
 
     @Override
     public void update(CacheEntry cacheEntry) {
-        db = dataCacheHelper.getWritableDatabase();
+        db = getDB();
         //TODO
     }
 
     @Override
     public List<CacheEntry> query(int topic) {
         Log.d(TAG, "queryAllEnties{" + "topic:" + topic + "}");
-        db = dataCacheHelper.getWritableDatabase();
-        Cursor cursor = db.query(DATA_CACHE_TABLE,
-                null,
-                TOPIC + "=?",
-                new String[]{topic + ""},
-                null,
-                null,
-                CACHE_TIME + " ASC");
-        return getCacheEntriesFromCursor(cursor);
+        db = getDB();
+        if(db!=null&& db.isOpen()){
+            Cursor cursor = db.query(DATA_CACHE_TABLE,
+                    null,
+                    TOPIC + "=?",
+                    new String[]{topic + ""},
+                    null,
+                    null,
+                    CACHE_TIME + " ASC");
+            return getCacheEntriesFromCursor(cursor);
+        }
+        return new ArrayList<>();
+
     }
 
     @NonNull
@@ -162,45 +185,55 @@ public class DBStore implements IStore {
     @Override
     public List<CacheEntry> queryAllEnties() {
         Log.d(TAG, "queryAllEnties{" + "all data" + "}");
-        db = dataCacheHelper.getWritableDatabase();
-        Cursor cursor = db.query(DATA_CACHE_TABLE,
-                null,
-                null,
-                null,
-                null,
-                null,
-                CACHE_TIME + " ASC");
-        return getCacheEntriesFromCursor(cursor);
+        db = getDB();
+        if(db!=null&& db.isOpen()){
+            Cursor cursor = db.query(DATA_CACHE_TABLE,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    CACHE_TIME + " ASC");
+            return getCacheEntriesFromCursor(cursor);
+        }
+        return new ArrayList<>();
     }
 
     @Override
     public List<Topic> queryAllTopics() {
         Log.d(TAG, "queryAllTopics{" + "all data" + "}");
-        db = dataCacheHelper.getWritableDatabase();
-        Cursor cursor = db.query(DATA_TOPIC,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null);
-        return getTopicsFromCursor(cursor);
+        db = getDB();
+        if(db!=null&& db.isOpen()){
+            Cursor cursor = db.query(DATA_TOPIC,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+            return getTopicsFromCursor(cursor);
+        }
+        return new ArrayList<>();
+
     }
 
     @Override
     public List[] queryAll() {
-        db = dataCacheHelper.getWritableDatabase();
-        final List[] datas = new List[2];
-        TransitionUtils.transition(db, new Runnable() {
-            @Override
-            public void run() {
-                List<Topic> topics = queryAllTopics();
-                List<CacheEntry> cacheEntries = queryAllEnties();
-                datas[0] = topics;
-                datas[1] = cacheEntries;
-            }
-        });
-        return datas;
+        db = getDB();
+        if(db!=null&& db.isOpen()){
+            final List[] datas = new List[2];
+            TransitionUtils.transition(db, new Runnable() {
+                @Override
+                public void run() {
+                    List<Topic> topics = queryAllTopics();
+                    List<CacheEntry> cacheEntries = queryAllEnties();
+                    datas[0] = topics;
+                    datas[1] = cacheEntries;
+                }
+            });
+            return datas;
+        }
+        return new List[0];
     }
 
     private List<Topic> getTopicsFromCursor(Cursor cursor) {

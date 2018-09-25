@@ -60,7 +60,7 @@ public class PinSender implements PinDetecter.PinDetectCallBack, Alarm.ICallBack
 
     public void stop() {
         Alarm.stop(PIN_ID, context);
-        if (taskSender != null) {
+        if (taskSender != null && pinTaskWrapper!=null) {
             taskSender.removeCallbacks(pinTaskWrapper);
         }
     }

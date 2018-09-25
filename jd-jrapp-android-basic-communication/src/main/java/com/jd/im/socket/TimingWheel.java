@@ -127,7 +127,7 @@ public class TimingWheel<E extends SlotElement> {
         }  
           
         boolean interrupted = false;  
-        while (workerThread.isAlive()) {  
+        while (workerThread!=null && workerThread.isAlive()) {
             workerThread.interrupt();  
             try {  
                 workerThread.join(100);  
