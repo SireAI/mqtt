@@ -65,8 +65,9 @@ public class SocketWorker extends Thread {
      */
     private boolean tryConnect() {
         if(readyToInterupt.get()){
-            tryInterrupt();
+            return false;
         }
+         long startPoint = 0;
         try {
             //连接失败的webSocket会关闭掉，需要重新创建
             webSocket = new WebSocket();
@@ -74,8 +75,16 @@ public class SocketWorker extends Thread {
                 remoteAddr = new InetSocketAddress(host, port);
             }
             // 阻塞，直到有响应或者异常
+            startPoint = SystemClock.currentThreadTimeMillis();
             webSocket.connect(remoteAddr, connectTimeOut);
         } catch (IOException e) {
+            //服务器宕机情况会导致快速失败，为避免过快重试导致内存压力
+            final long endPoint = SystemClock.currentThreadTimeMillis();
+            final long tryTime = endPoint - startPoint;
+            final long tryThreshold = connectTimeOut-1000;
+            if(tryTime <=tryThreshold){
+                SystemClock.sleep(tryThreshold-tryTime);
+            }
             //连接重试
            return retrayStrategy(e);
         }
