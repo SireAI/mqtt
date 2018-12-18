@@ -44,7 +44,8 @@ public class MQTTUnsubscribe extends MQTTMessage implements Persistentable{
             setRemainingLength(remainingLength);
             variableHeader = new byte[2];
             System.arraycopy(data, i, variableHeader, 0, variableHeader.length);
-            packageIdentifier = new BigInteger(1, variableHeader).intValue();
+
+            packageIdentifier = (variableHeader[variableHeader.length - 2] >> 8 & 0xFF) | (variableHeader[variableHeader.length - 1] & 0xFF);
             dis.read(new byte[i+1]);
             readed = 1;
             while (readed < remainingLength) {

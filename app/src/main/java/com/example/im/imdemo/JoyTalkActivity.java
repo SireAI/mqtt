@@ -23,7 +23,8 @@ import com.jd.im.mqtt.MQTTException;
 import com.jd.im.mqtt.MQTTVersion;
 import com.jd.im.mqtt.MqttConnectOptions;
 
-import com.jd.jrapp.bm.message.service.JDMqttService;
+import com.jd.im.mqtt.messages.MQTTMessage;
+import com.jd.im.service.MqttService;
 import com.sire.micro.databuffer.DataBuffer;
 import com.sire.micro.databuffer.command.Result;
 
@@ -33,18 +34,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.concurrent.ArrayBlockingQueue;
 
 
 import paho.mqtt.java.example.R;
 
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
+import static com.jd.im.mqtt.MQTTConstants.QOS_0;
 import static com.jd.im.mqtt.MQTTConstants.QOS_1;
+import static com.jd.im.mqtt.MQTTConstants.QOS_2;
 
 public class JoyTalkActivity extends FragmentActivity implements MqttClient.PushCallBack<Object> {
     private static final String TAG = "JoyTalkActivity";
     //
-    final String serverUri = "tcp://iot.eclipse.org:1883";
-//    final String serverUri = "tcp://10.13.81.148:8183";
+//    final String serverUri = "tcp://iot.eclipse.org:1883";
+//    final String serverUri = "tcp://192.168.31.98:1883";
+
+        final String serverUri = "tcp://192.168.31.98:1883";
     //测试环境地址
 //    final String serverUri = "tcp://172.25.47.19:8183";
     //外网可访问
@@ -55,7 +61,7 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
     final String publishTopic = "AndroidPublishTopic";
     final String publishMessage = "Hello World!";
     ////
-    String clientId = "PC;version=2.0.1.0430;uuid=0a092ds99a012897dbc";
+    String clientId = "0a092ds99a012897dbc";
 
     private HistoryAdapter mAdapter;
 
@@ -89,11 +95,11 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
         if (true) {
             connect();
         } else {
-            Intent intent = new Intent(this, JDMqttService.class);
+            Intent intent = new Intent(this, MqttService.class);
             if(isMonitor){
-                JDMqttService.start(this,"1","sire","1","sire","http://www.lagou.com/image2/M00/01/5C/CgqLKVXj66GAaM2cAAFq682mH60142.png");
+//                JDMqttService.startrt(this,"1","sire","1","sire","http://www.lagou.com/image2/M00/01/5C/CgqLKVXj66GAaM2cAAFq682mH60142.png");
             }else {
-                JDMqttService.start(this,"jdpay/testuser","passwd","2","jhon","http://screen.uimg.cn/cc/9b/cc9b7ec9af34a15bd6f94190e8519fc4.jpg");
+//                JDMqttService.start(this,"jdpay/testuser","passwd","2","jhon","http://screen.uimg.cn/cc/9b/cc9b7ec9af34a15bd6f94190e8519fc4.jpg");
 //                new Handler().postDelayed(new Runnable() {
 //                    @Override
 //                    public void run() {
@@ -141,18 +147,24 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
     }
 
     private void connect() {
+        final MQTTMessage mqttMessage = new MQTTMessage();
         MqttConnectOptions mqttConnectOptions = new MqttConnectOptions()
                 .setAutomaticReconnect(true)//是否启用重连机制，默认是
                 .setCleanSession(false)//是否清楚会话状态，默认否
-                .setClientId(clientId)//客户端唯一标识
+                .setClientId(clientId+new Random(100).nextInt())//客户端唯一标识
                 .setKeepAliveInterval(8 * 60000)//服务端保持长连接最大时长
                 // ，若超过则会主动断开连接，此值会影响心跳探测最大间隔，建议使用默认8分钟
                 .setServerURIs(new String[]{serverUri})//服务器地址
-                .setUserName("222")//账号
+                .setUserName("sire")//账号
                 .setPassword("sire")//密码
                 .setProtocalName(MQTTVersion.VERSION_311)//协议名，默认VERSION_311
 //                .setProtocalName(MQTTVersion.VERSION_IM)
 //                .setExtraHeaderPart(new PublishHeaderExtraPart())
+                .setWillFlag(true)
+                .setWillQos(QOS_2)
+                .setWillTopic(subscriptionTopic)
+                .setWillMessage("遗嘱消息测试")
+                .setWillRetain(false)
                 ;
         MqttClient mqttClient = new MqttClient.Builder()
                 .context(this)
@@ -160,7 +172,7 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
 //                        .bindPublish(ClientPublishMessage.MessageResponse.class)
 //                        .bindDisconnect(DisconnectMessage.Disconnect.class).bindAck(Ack.MessageAck.class))//默认的数据解析方式为String
                 .pushCallBack(this)//服务端主动push数据回调
-                .qos(QOS_1) //质量等级，默认是qos_1
+                .qos(QOS_2) //质量等级，默认是qos_1
                 .openLog() //是否打开调试日志，建议正式版本关闭
                 .build();
         mqttClient.connect(mqttConnectOptions, new ConnectCallBack() {
@@ -256,7 +268,7 @@ public class JoyTalkActivity extends FragmentActivity implements MqttClient.Push
     }
 
     private void publishnor() {
-        MqttClient.getInstance(this).publish("ss","我是sire");
+        MqttClient.getInstance(this).publish("SIRE","我是sire");
     }
 
     private void addCacheData() {

@@ -7,10 +7,10 @@ ext {
     publishedGroupId = rootProject.ext.maven.publishedGroupIdForLib
     artifact = 'mqtt-socket'
 
-    libraryVersion = '1.0.2-201809105-SNAPSHOT'
+    libraryVersion = '1.0.3-20181218-SNAPSHOT'
 
     libraryName = 'mqtt-socket'
-    libraryDescription = 'JDJRAPP sh busniess module'
+    libraryDescription = 'JDJRAPP zhyy busniess module'
 
     siteUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
     gitUrl = 'http://jcode.cbpmgt.com/git/jdjrapp_Android.git'
@@ -35,7 +35,7 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 22
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
     }
@@ -52,9 +52,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:27.1.1'
+    implementation 'com.android.support:support-annotations:27.1.1'
 }
 
-//apply from: '../publish.gradle'
-apply from: '../maven-install.gradle'
+apply from: '../publish.gradle'
+//apply from: '../maven-install.gradle'
 

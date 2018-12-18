@@ -2,7 +2,6 @@
 package com.jd.im;
 
 // Declare any non-default types here with import statements
-import com.jd.im.IMQTTMessage;
 
 interface IMqttConnectOptions {
       char[] getPassword();
@@ -21,9 +20,15 @@ interface IMqttConnectOptions {
 
       String getClientId();
 
-      String getWillDestination();
 
-      IMQTTMessage getWillMessage();
+      String  getWillTopic();
+
+      String  getWillMessage();
+
+      boolean  isWillRetain();
+      boolean  willFlag();
+
+      int  getWillQoS();
 
       String getProtocalName();
 

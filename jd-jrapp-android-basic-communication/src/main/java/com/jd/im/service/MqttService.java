@@ -1,7 +1,10 @@
 package com.jd.im.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -42,6 +45,7 @@ import com.jd.im.utils.Log;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.jd.im.heartbeat.PinDetecter.ACTIVE_MODE;
 import static com.jd.im.mqtt.MQTTConnectionConstants.STATE_CONNECTED;
@@ -65,6 +69,9 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     private static final String TAG = "MqttService";
     private static final int DATA = 5;
     private static final int RECONNECT = 6;
+    public static final String CHANNEL_ID = "IM";
+    public static final String CHANNEL_NAME = "message";
+    public static final int NOTIFICATION_ID = 100;
     private Object lock = new Object();
     /**
      * 配合超时时间，这个次数大约是半天，正常连续超时重传1小时，如果仍然无法正确应答
@@ -122,7 +129,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     private PinSender pinSender;
     private MqttReconnectAction reconnectAction = new MqttReconnectAction();
     private ScheduledRetray scheduledRetray;
-    private int connectState = STATE_NONE;
+    private AtomicInteger connectState = new AtomicInteger(STATE_NONE);
     private MessageStore messageStore;
     private IBinder.DeathRecipient mDeathRecipient;
 
@@ -169,8 +176,9 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
                     public void binderDied() {
                         synchronized (lock){
                             Log.d(TAG, "binder died. name:" + Thread.currentThread().getName());
-                            if (imRemoteService == null)
+                            if (imRemoteService == null){
                                 return;
+                            }
                             imRemoteService.asBinder().unlinkToDeath(this, 0);
                             imRemoteService = null;
                             mDeathRecipient = null;
@@ -188,7 +196,9 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     @Override
     public void onDestroy() {
         Log.w(TAG, "服务销毁");
-//        stopForeground(true);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            stopForeground(true);
+        }
         disconnect(true);
         pinSender.release();
         cancelDataWorker();
@@ -217,9 +227,9 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      */
     @Override
     public void notifyConnectState(int state) {
-        this.connectState = state;
+        this.connectState.set(state);
         try {
-            if (state == STATE_CONNECTED) {
+            if (connectState.get() == STATE_CONNECTED) {
                 startPin();
                 if (connectOptions != null && !connectOptions.isCleanSession()) {
                     resumeData();
@@ -284,7 +294,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     @Override
     public void onDataArrived(byte[] data) {
         if (dataWorkerSender != null) {
-            Message message = dataWorkerSender.obtainMessage();
+            Message message = dataWorkerSender.obtainMessage(DATA);
             message.obj = data;
             message.what = DATA;
             dataWorkerSender.sendMessage(message);
@@ -314,13 +324,12 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     public boolean handleMessage(Message msg) {
         if (msg.what == DATA && msg.obj != null && mqttQos != null && msg.obj instanceof byte[]) {
             mqttQos.operate((byte[]) msg.obj);
-            return true;
         }
         if (msg.what == RECONNECT && msg.obj != null && msg.obj instanceof MqttReconnectAction) {
             ((MqttReconnectAction) msg.obj).excute();
-            return true;
         }
-        return false;
+        return true;
+
     }
 
     /**
@@ -344,7 +353,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
 
     @Override
-    public  void dispatchPush(IMQTTMessage publish) {
+    public  boolean dispatchPush(IMQTTMessage publish) {
         try {
 
             if(imRemoteService != null){
@@ -357,6 +366,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
                 if (localService != null) {
                     if(localService.asBinder().isBinderAlive()){
                         localService.push2Client(publish);
+                        return true;
                     }
                 } else {
                     Log.w(TAG, "服务端消息到达，但客户端服务未绑定,消息将丢失...");
@@ -365,6 +375,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
@@ -474,7 +485,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     }
 
     private void resumeConnectImmediately() {
-        if(this.automaticReconnect && (this.connectState == STATE_NONE || this.connectState == STATE_CONNECTION_FAILED && connectOptions!=null && connectCallBack!=null)){
+        if(this.automaticReconnect && connectState.get() <= STATE_CONNECTION_FAILED && connectOptions != null && connectCallBack!=null){
             connect(connectOptions, connectCallBack);
         }
     }
@@ -514,10 +525,11 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
                         , connectOptions.isCleanSession()
                         , connectOptions.getProtocalName());
                 connect.setKeepAlive(connectOptions.getKeepAliveInterval());
-                if (connectOptions.getWillMessage() == null) {
-                    connect.setWillFlag(false);
-                    connect.setWillTopic("");
-                    connect.setWillMessage("");
+                //遗嘱消息设置
+                final boolean willFlag = connectOptions.willFlag();
+                connect.setWillFlag(willFlag);
+                if(willFlag){
+                    connect.setWill(connectOptions.getWillTopic(),connectOptions.getWillMessage(),connectOptions.isWillRetain(), (byte) connectOptions.getWillQoS());
                 }
                 sendMessage(connect);
             } catch (RemoteException e) {
@@ -526,20 +538,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         }
     }
 
-    /**
-     * 发布消息
-     *
-     * @param topic
-     * @param payload
-     * @param qos
-     */
-    public int publish(String topic, byte[] payload, byte qos) {
-        int identifier = mqttQos.getIdentifierHelper().getIdentifier();
-        MQTTPublish publish = MQTTPublish.newInstance(topic, payload, qos, identifier);
-        sendMessage(publish);
-        mqttQos.getIdentifierHelper().addSentPackage(publish);
-        return identifier;
-    }
+
 
     /**
      * 服务器需保持这条消息，当有新增的订
@@ -551,10 +550,13 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      * @param payload
      * @param qos
      */
-    public void publishRetain(String topic, byte[] payload, byte qos) {
-        MQTTPublish publish = MQTTPublish.newInstance(topic, payload, qos);
-        publish.setRetain(true);
+    public int publishRetain(String topic, byte[] payload, byte qos,boolean retain) {
+        int identifier = mqttQos.getIdentifierHelper().getIdentifier();
+        MQTTPublish publish = MQTTPublish.newInstance(topic, payload, qos,identifier);
+        publish.setRetain(retain);
         sendMessage(publish);
+        mqttQos.getIdentifierHelper().addSentPackage(publish);
+        return identifier;
     }
 
     /**
@@ -618,10 +620,15 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
         }
     }
 
+    /**
+     * 重连条件：重连标记为真，pin发射器存在，数据任务中没有重连任务，长连接任务中没有在进行重连，处于一个重连周期内
+     */
     private synchronized void reconnect() {
         if (automaticReconnect && pinSender!=null) {
             final RetrayParam retrayParam = pinSender.getPinDetecter().getRetrayParam();
-            if (!isReconnectActionRunning()) {
+            final boolean hasRetayAction = isReconnectActionRunning();
+            final boolean isUnConnectState = connectState.get() <= STATE_CONNECTION_FAILED;
+            if (!hasRetayAction && isUnConnectState) {
                 if (retrayParam.getRepeatCount() > 0) {
                     retrayParam.repeatCountStepDown();
                     reconnectAction.setRepeatCount(retrayParam.repeatCountSteped());
@@ -631,16 +638,18 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
                             connect(connectOptions, connectCallBack);
                         }
                     });
-                    Message message = dataWorkerSender.obtainMessage();
+                    Message message = dataWorkerSender.obtainMessage(RECONNECT);
                     message.what = RECONNECT;
                     message.obj = reconnectAction;
                     //延时重连
                     dataWorkerSender.sendMessageDelayed(message, retrayParam.reconnectTimeStepUp());
                 } else {
                     retrayParam.reset();
-                    Log.d(TAG, "尝试重新建立长连接" + retrayParam.getDefaultRepeatCount() + "次失败...");
+                    Log.d(TAG, "尝试重新初始化长连接流程" + retrayParam.getDefaultRepeatCount() + "次失败...");
                    startScheduleRetray();
                 }
+            }else {
+                Log.d(TAG, hasRetayAction?"已经存在重试任务":"已经处于连接中或者已经连接");
             }
         } else {
             Log.d(TAG, "链接不会重试");
@@ -711,8 +720,9 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      * @throws RemoteException
      */
     private void startSocketWorker() throws RemoteException {
-        socketWorer = new SocketWorker(connectOptions.getServerURIs()[0], connectOptions.getPorts()[0], connectOptions.getConnectionTimeout(), connectOptions.getReconnectCount(), this);
+        socketWorer = new SocketWorker(connectOptions.getServerURIs()[0], connectOptions.getPorts()[0], connectOptions.getConnectionTimeout(), connectOptions.getReconnectCount(), this,this);
         socketWorer.setName(SOCKET_WORKER);
+        socketWorer.recordeUserState(pinSender.getPinDetecter().getMode());
         socketWorer.start();
     }
 
@@ -785,7 +795,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      * @return
      */
     boolean isServiceOk() {
-        if (!NetStatusUtil.isConnected(this) || isServiceOutage()) {
+        if (!NetStatusUtil.isConnected(this)) {
             notifyConnectState(STATE_CONNECTION_FAILED);
             return false;
         }
@@ -838,8 +848,23 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-//        startForeground(1000, new Notification());
-        return super.onStartCommand(intent, flags, startId);
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            final NotificationChannel notificationChannel = notificationManager.getNotificationChannel(CHANNEL_ID);
+            if(notificationChannel==null){
+                NotificationChannel  channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
+                channel.setDescription("");
+                channel.setSound(null, null);
+                channel.setShowBadge(false);
+                channel.setBypassDnd(false);
+                channel.enableLights(false);
+                channel.enableVibration(false);
+                notificationManager.createNotificationChannel(channel);
+            }
+            Notification notification = new Notification.Builder(this, CHANNEL_ID).setOngoing(false).setAutoCancel(true).build();
+            startForeground(NOTIFICATION_ID, notification);
+        }
+        return START_REDELIVER_INTENT;
     }
 
     /**
@@ -869,17 +894,24 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
 
     public void setMode(int mode) {
         //切换前台，网络正常，非连接状态，将尝试重连一次
+        Log.d(TAG, "应用模式切换：" + (mode==1?"活跃":"后台"));
+        if(socketWorer != null){
+            socketWorer.recordeUserState(mode);
+        }
         if(pinSender!=null){
             if (isServiceOutage()) {
                 if (mode == ACTIVE_MODE) {
                     //固定为活跃态
                     pinSender.getPinDetecter().changeEvent(ACTIVE_MODE);
                     reconnect();
+                }else {
+                    pinSender.getPinDetecter().setMode(mode);
                 }
             } else {
                 pinSender.getPinDetecter().changeEvent(mode);
             }
         }
+
     }
 
     /**
@@ -888,7 +920,7 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
      * @return
      */
     private boolean isServiceOutage() {
-        return NetStatusUtil.isConnected(this) && connectState != STATE_CONNECTED && connectState != STATE_CONNECTING && connectOptions != null;
+        return NetStatusUtil.isConnected(this) && connectState.get() <=STATE_CONNECTION_FAILED && connectOptions != null;
     }
 
     MessageStore getMessageStore() {

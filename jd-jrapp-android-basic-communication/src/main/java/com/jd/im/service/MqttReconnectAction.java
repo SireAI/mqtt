@@ -20,7 +20,7 @@ public class MqttReconnectAction {
         if(connectTask!=null){
             connectTask.run();
         }
-        Log.d(TAG, "第" + repeatCount + "次尝试重新建立长连接...");
+        Log.d(TAG, "第" + repeatCount + "次尝试重新建立长连接流程...");
 
     }
 }

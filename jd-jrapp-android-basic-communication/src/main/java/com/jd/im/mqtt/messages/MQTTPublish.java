@@ -107,7 +107,8 @@ public class MQTTPublish extends MQTTMessage implements Persistentable {
             case AT_LEAST_ONCE:
             case EXACTLY_ONCE:
                 // 2 byte packageIdentifier
-                packageIdentifier = new BigInteger(1, variableHeader).intValue();
+                packageIdentifier = (variableHeader[variableHeader.length - 1]) | (variableHeader[variableHeader.length - 2]);
+
                 break;
         }
 

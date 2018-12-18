@@ -44,8 +44,9 @@ public class MQTTPuback extends MQTTMessage  {
         if (payload.length > 0)
             System.arraycopy(buffer, i + variableHeader.length, payload, 0, remainingLength - variableHeader.length);
 
+        // Get package identifier
+        packageIdentifier = (variableHeader[variableHeader.length - 2] >> 8 & 0xFF) | (variableHeader[variableHeader.length - 1] & 0xFF);
 
-        packageIdentifier = new BigInteger(1, variableHeader).intValue();
     }
 
     public static MQTTPuback newInstance(int packageIdentifier) {

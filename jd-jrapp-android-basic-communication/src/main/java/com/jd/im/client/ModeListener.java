@@ -68,7 +68,7 @@ public class ModeListener {
     public void notifyAppMode() {
         if (callBack != null) {
             handler.removeCallbacks(checkMode);
-            handler.postDelayed(checkMode,5000);
+            handler.postDelayed(checkMode,2000);
         }
     }
 

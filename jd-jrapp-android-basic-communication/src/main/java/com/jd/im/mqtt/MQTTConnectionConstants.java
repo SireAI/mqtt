@@ -12,38 +12,23 @@ public class MQTTConnectionConstants {
   /**
    * Doing nothing...
    */
-  public static final int STATE_NONE = CONSTANTS_BASE + 0;
+  public static final int STATE_NONE = 0;
+
+    /**
+     * Connection attempt failed
+     */
+    public static final int STATE_CONNECTION_FAILED =  1;
 
   /**
    * Trying to establish connection...
    */
-  public static final int STATE_CONNECTING = CONSTANTS_BASE + 1;
+  public static final int STATE_CONNECTING = 2;
 
   /**
    * Connection established!
    */
-  public static final int STATE_CONNECTED = CONSTANTS_BASE + 2;
+  public static final int STATE_CONNECTED = 3;
 
-  /**
-   * Connection attempt failed
-   */
-  public static final int STATE_CONNECTION_FAILED = CONSTANTS_BASE + 3;
-
-  /**
-   * Indicate that the state of the connection has changed
-   */
-  public static final int STATE_CHANGE = CONSTANTS_BASE + 5;
-
-  /**
-   * Sent directly when the client has published, can be used if client wants to
-   * receive all messages it sends without subscribing.
-   */
-  public static final int MQTT_RAW_PUBLISH = CONSTANTS_BASE + 10;
-
-  /**
-   * Raw byte-array when a message has been read (any message on the stream)
-   */
-  public static final int MQTT_RAW_READ = CONSTANTS_BASE + 11;
 
   public static final int CLIENT_MAX_INTERVAL = 8*60000;
   public static final byte MESSAGE_ACK =-7;

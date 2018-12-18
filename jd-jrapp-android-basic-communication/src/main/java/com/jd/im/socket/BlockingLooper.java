@@ -1,9 +1,11 @@
 package com.jd.im.socket;
 
+import android.os.Process;
 import android.support.annotation.RestrictTo;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -20,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public class BlockingLooper<T> {
     public static final int CONDITION_TIME_OUT = 2000;
-    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    private  LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
     private  WorkerThread workerThread;
 
 
@@ -35,11 +37,15 @@ public class BlockingLooper<T> {
         private  Callback callback;
         private final Lock lock  = new ReentrantLock();
         private final Condition loopCondition = lock.newCondition();
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
 
 
         public WorkerThread(LinkedBlockingQueue queue, Callback callback) {
             this.queue = queue;
             this.callback = callback;
+            setDaemon(true);
+            setPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            setName("bloking-looper-"+threadNumber.getAndIncrement());
         }
 
         @Override
@@ -52,7 +58,6 @@ public class BlockingLooper<T> {
                     if(callback == null){
                         throw new RuntimeException("callback回调不能为空");
                     }
-
                     if(callback.meetTheCondition()){
                         try {
                             Object task = queue.take();
@@ -69,6 +74,8 @@ public class BlockingLooper<T> {
                             loopCondition.await(CONDITION_TIME_OUT, TimeUnit.SECONDS);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                        }finally {
+                            lock.unlock();
                         }
                     }
 

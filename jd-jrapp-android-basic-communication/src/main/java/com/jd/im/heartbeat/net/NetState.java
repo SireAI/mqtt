@@ -22,88 +22,86 @@ import com.jd.im.utils.Log;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public abstract class NetState extends BroadcastReceiver {
-    public static NetworkInfo lastActiveNetworkInfo = null;
-    public static WifiInfo lastWifiInfo = null;
-    public static boolean lastConnected = true;
+    public static final int NOT_SET = -2;
     public static String TAG = "NetState";
+    private ConnectivityManager mgr;
+    private int currentNetType = NOT_SET;
+    private boolean connected = false;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (context == null || intent == null) {
             return;
         }
-        ConnectivityManager mgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = null;
+        if(mgr == null){
+            mgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        }
+        // 如果相等的话就说明网络状态发生了变化
+        checkNetState(context);
+    }
+
+
+    private void checkNetState(Context context) {
+        int netWorkType = getNetWorkType();
+         NetworkInfo activeNetworkInfo=null;
         try {
-            netInfo = mgr.getActiveNetworkInfo();
-        } catch (Exception e) {
-            Log.i(TAG, "getActiveNetworkInfo failed.");
+            activeNetworkInfo = mgr.getActiveNetworkInfo();
+        }catch (Exception e){
         }
-
-        checkConnInfo(context, netInfo);
+        //关闭情况
+        if(activeNetworkInfo == null){
+            updateNetParam(NOT_SET,false);
+            onNetworkChange(context,false);
+            return;
+        }
+        final boolean connectState = activeNetworkInfo.isConnected();
+        if(netWorkType == currentNetType){
+            //网络类型没有变，可能是断链了，也可能是统一网络类型不同网络的变化
+            if(connected!=connectState){
+                updateNetParam(netWorkType, connectState);
+                onNetworkChange(context,connectState);
+                return;
+            }
+        }else {
+            updateNetParam(netWorkType, connectState);
+            onNetworkChange(context, connectState);
+        }
     }
 
-    private void checkConnInfo(final Context context, final NetworkInfo activeNetInfo) {
-
-        if (activeNetInfo == null) {
-            lastActiveNetworkInfo = null;
-            lastWifiInfo = null;
-            onNetworkChange(context);
-        } else if (activeNetInfo.getDetailedState() != NetworkInfo.DetailedState.CONNECTED) {
-
-            if (lastConnected) {
-                lastActiveNetworkInfo = null;
-                lastWifiInfo = null;
-                onNetworkChange(context);
-            }
-
-            lastConnected = false;
-        } else {
-            if (isNetworkChange(context, activeNetInfo)) {
-                onNetworkChange(context);
-            }
-            lastConnected = true;
-        }
-
+    private void updateNetParam(int netWorkType, boolean connectState) {
+        connected = connectState;
+        currentNetType = netWorkType;
     }
 
+
+
+    public abstract void onNetworkChange(Context context, boolean connected);
 
     /**
-     * 与上次网络信息相比，是否发生网络切换
-     *
-     * @param context
-     * @param activeNetInfo
-     * @return
+     * 没有连接网络
      */
-    private boolean isNetworkChange(final Context context, final NetworkInfo activeNetInfo) {
-        boolean isWifi = (activeNetInfo.getType() == ConnectivityManager.TYPE_WIFI);
-        if (isWifi) {
-            WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-            WifiInfo wi = wifiManager.getConnectionInfo();
-            if (wi != null && lastWifiInfo != null && !TextUtils.isEmpty(lastWifiInfo.getBSSID()) && lastWifiInfo.getBSSID().equals(wi.getBSSID())
-                    && lastWifiInfo.getSSID().equals(wi.getSSID())
-                    && lastWifiInfo.getNetworkId() == wi.getNetworkId()) {
-                Log.w(TAG, "Same Wifi, do not NetworkChanged");
-                return false;
+    private static final int NETWORK_NONE = -1;
+    /**
+     * 移动网络
+     */
+    private static final int NETWORK_MOBILE = 0;
+    /**
+     * 无线网络
+     */
+    private static final int NETWORK_WIFI = 1;
+    public  int getNetWorkType() {
+        NetworkInfo activeNetworkInfo = mgr
+                .getActiveNetworkInfo();
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnected()) {
+            if (activeNetworkInfo.getType() == (ConnectivityManager.TYPE_WIFI)) {
+                return NETWORK_WIFI;
+            } else if (activeNetworkInfo.getType() == (ConnectivityManager.TYPE_MOBILE)) {
+                return NETWORK_MOBILE;
             }
-            lastWifiInfo = wi;
-        } else if (lastActiveNetworkInfo != null
-                && lastActiveNetworkInfo.getExtraInfo() != null && activeNetInfo.getExtraInfo() != null
-                && lastActiveNetworkInfo.getExtraInfo().equals(activeNetInfo.getExtraInfo())
-                && lastActiveNetworkInfo.getSubtype() == activeNetInfo.getSubtype()
-                && lastActiveNetworkInfo.getType() == activeNetInfo.getType()) {
-            return false;
-
-        } else if (lastActiveNetworkInfo != null
-                && lastActiveNetworkInfo.getExtraInfo() == null && activeNetInfo.getExtraInfo() == null
-                && lastActiveNetworkInfo.getSubtype() == activeNetInfo.getSubtype()
-                && lastActiveNetworkInfo.getType() == activeNetInfo.getType()) {
-            Log.w(TAG, "Same Network, do not NetworkChanged");
-            return false;
+        } else {
+            return NETWORK_NONE;
         }
-        lastActiveNetworkInfo = activeNetInfo;
-        return true;
+        return NETWORK_NONE;
     }
-
-    public abstract void onNetworkChange(Context context);
 }
+

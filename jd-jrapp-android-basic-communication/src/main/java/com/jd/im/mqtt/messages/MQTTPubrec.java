@@ -58,7 +58,7 @@ public class MQTTPubrec extends MQTTMessage {
       System.arraycopy(buffer, i, payload, 0, payload.length);
 
     // Only get package identifier if the QoS is above AT_MOST_ONCE
-    packageIdentifier = new BigInteger(1, variableHeader).intValue();
+    packageIdentifier = (variableHeader[variableHeader.length - 1]) | (variableHeader[variableHeader.length - 2]);
   }
 
   @Override

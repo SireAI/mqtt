@@ -92,15 +92,22 @@ public class MqttQos {
                 int pubIdentifier = serverPubRel.getPackageIdentifier();
                 IMQTTMessage mqttMessage = identifierHelper.getMessageFromReceivedPackages(pubIdentifier);
                 if (mqttMessage != null && mqttMessage instanceof MQTTPublish) {
-                    dispatchPush(mqttMessage);
-                    identifierHelper.removeReceivedPackage(pubIdentifier);
+                    //消费移除
+                    final boolean consumed = dispatchPush(mqttMessage);
+                    if(consumed){
+                        identifierHelper.removeReceivedPackage(pubIdentifier);
+                        identifierHelper.removeSentPackage(pubIdentifier);
+                        MQTTPubcomp pubComp = MQTTPubcomp.newInstance(pubIdentifier);
+                        sendMessage(pubComp);
+                    }
                 } else {
                     //内存上的数据丢失主要是程序异常退出，服务器默认之前的会话继续交互，为了使得丢失数据的会话终止，需要发送PUBLISHCOM消息
                     Log.w(TAG, "memory lost push message,id is " + pubIdentifier);
+                    identifierHelper.removeSentPackage(pubIdentifier);
+                    MQTTPubcomp pubComp = MQTTPubcomp.newInstance(pubIdentifier);
+                    sendMessage(pubComp);
                 }
-                identifierHelper.removeSentPackage(pubIdentifier);
-                MQTTPubcomp pubComp = MQTTPubcomp.newInstance(pubIdentifier);
-                sendMessage(pubComp);
+
                 break;
             case PUBCOMP:
                 //删除PUBLISHREL,通知发送成功
@@ -145,9 +152,12 @@ public class MqttQos {
                 break;
             case AT_LEAST_ONCE:
                 // 分发消息，发送确认
-                dispatchPush(publish);
-                MQTTPuback pubAck = MQTTPuback.newInstance(publish.getPackageIdentifier());
-                sendMessage(pubAck);
+                boolean consumed = dispatchPush(publish);
+                //若客户端没有消费此消息，服务器一段时间会再次发送
+                if(consumed){
+                    MQTTPuback pubAck = MQTTPuback.newInstance(publish.getPackageIdentifier());
+                    sendMessage(pubAck);
+                }
                 break;
             case EXACTLY_ONCE:
                 //存储PUBLISH消息,发送PUBREC
@@ -182,10 +192,12 @@ public class MqttQos {
         }
     }
 
-    private void dispatchPush(IMQTTMessage publish) {
+    private boolean dispatchPush(IMQTTMessage publish) {
+        boolean consumed = true;
         if (qosCallBack != null) {
-            qosCallBack.dispatchPush(publish);
+            consumed =  qosCallBack.dispatchPush(publish);
         }
+        return consumed;
     }
 
     private void notifyOperationResult(boolean success, int id,byte[] extraInfor) {
@@ -239,10 +251,10 @@ public class MqttQos {
 
         /**
          * 只有服务端下发的push消息才会向前分发
-         *
          * @param publish
+         * @return  true表示分发成功，false表示分发失败
          */
-        void dispatchPush(IMQTTMessage publish);
+        boolean dispatchPush(IMQTTMessage publish);
 
         /**
          * 收到服务端Pin

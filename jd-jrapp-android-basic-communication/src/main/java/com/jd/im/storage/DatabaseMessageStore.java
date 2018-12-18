@@ -162,16 +162,23 @@ public class DatabaseMessageStore implements MessageStore {
                 int type = cursor.getInt(cursor.getColumnIndex(TYPE));
                 byte[] content = cursor.getBlob(cursor.getColumnIndex(CONTENTS));
                 IMQTTMessage message = null;
-                if (type == PUBLISH) {
-                    MQTTPublish mqttPublish = MQTTPublish.fromBuffer(content);
-                    mqttPublish.setDup();
-                    message = mqttPublish;
-                } else if (type == SUBSCRIBE) {
-                    message = MQTTSubscribe.fromBuffer(content);
-                } else if (type == UNSUBSCRIBE) {
-                    message = MQTTUnsubscribe.fromBuffer(content);
-                } else {
-                    Log.w(TAG, "message not support resume");
+                if (content != null && content.length > 0) {
+                    switch (type) {
+                        case PUBLISH:
+                            MQTTPublish mqttPublish = MQTTPublish.fromBuffer(content);
+                            mqttPublish.setDup();
+                            message = mqttPublish;
+                            break;
+                        case SUBSCRIBE:
+                            message = MQTTSubscribe.fromBuffer(content);
+                            break;
+                        case UNSUBSCRIBE:
+                            message = MQTTUnsubscribe.fromBuffer(content);
+                            break;
+                        default:
+                            Log.w(TAG, "message not support resume");
+                            break;
+                    }
                 }
                 hasNext = cursor.moveToNext();
                 return message;
@@ -195,7 +202,7 @@ public class DatabaseMessageStore implements MessageStore {
         try {
             return getWritableDatabase();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -205,7 +212,7 @@ public class DatabaseMessageStore implements MessageStore {
     public synchronized void clearArrivedMessages(String clientHandle) {
 
         db = getDatabase();
-        if ( db !=null && db.isOpen()) {
+        if (db != null && db.isOpen()) {
             String[] selectionArgs = {clientHandle};
             int rows = 0;
             if (clientHandle == null) {

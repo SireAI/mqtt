@@ -36,9 +36,9 @@ public class RestoreDataAction implements Runnable {
         if(databaseMessageStore == null)return;
         Iterator<IMQTTMessage> allArrivedMessages = databaseMessageStore.getAllArrivedMessages(mqttService.getClientHandle());
         if(allArrivedMessages!=null){
+            TimingWheel<Event<MqttSenderAction>> eventTimingWheel = mqttService.getEventTimingWheel();
             while (allArrivedMessages.hasNext()) {
                 IMQTTMessage message = allArrivedMessages.next();
-                TimingWheel<Event<MqttSenderAction>> eventTimingWheel = mqttService.getEventTimingWheel();
                 if (message == null || eventTimingWheel == null) continue;
                 try {
                     boolean exist = eventTimingWheel.hasEvent(message.getPackageIdentifier());

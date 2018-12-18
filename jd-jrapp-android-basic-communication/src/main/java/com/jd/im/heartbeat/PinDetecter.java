@@ -3,6 +3,7 @@ package com.jd.im.heartbeat;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.support.annotation.IntDef;
 import android.support.annotation.RestrictTo;
 
@@ -15,6 +16,7 @@ import com.jd.im.utils.Utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.jd.im.mqtt.MQTTConnectionConstants.CLIENT_MAX_INTERVAL;
 
@@ -82,8 +84,7 @@ public class PinDetecter {
     private int currentHeartInterval = FIXED_HEART_INTERVAL;
 
     private int failedRepeatCount = HEAT_FAILED_ATEMPT_COUNT;
-    @Mode
-    private int mode;
+    private AtomicInteger mode = new AtomicInteger(IDEL_MODE);
     /**
      * 是否稳定态
      */
@@ -112,22 +113,18 @@ public class PinDetecter {
      */
     private NetState netState = new NetState() {
         @Override
-        public void onNetworkChange(Context context) {
-            Log.d(TAG, "network changed ...");
-            boolean connected = NetStatusUtil.isConnected(context);
+        public void onNetworkChange(Context context, boolean connected) {
+            Log.d(TAG, "network changed :"+(connected?"connected":"disConnected"));
             FIXED_HEART_INTERVAL = MIN_HEART_INTERVAL;
             if (connected) {
                 //网络变化处于连接状态
-                int previouseMode = mode;
+                int previouseMode = mode.get();
                 if (previouseMode == IDEL_MODE) {
                     //从断网到联网
                     boolean appIsInBackground = Utils.isAppIsInBackground(context);
-                    PinDetecter.this.mode = appIsInBackground ? BACKGORUND_MODE : ACTIVE_MODE;
-                    if (PinDetecter.this.mode == BACKGORUND_MODE) {
+                    PinDetecter.this.mode.set(appIsInBackground ? BACKGORUND_MODE : ACTIVE_MODE);
+                    if (PinDetecter.this.mode.get() == BACKGORUND_MODE) {
                         resetBackgroudMode();
-                    }
-                    if (pinDetectCallBack != null) {
-                        pinDetectCallBack.onNetConnected();
                     }
                 } else if (previouseMode == ACTIVE_MODE) {
                     //切换网络，调整到最小跳
@@ -135,9 +132,12 @@ public class PinDetecter {
                     //切换网络，重新学习
                     resetBackgroudMode();
                 }
+                if (pinDetectCallBack != null) {
+                    pinDetectCallBack.onNetConnected();
+                }
             } else {
                 //断网
-                PinDetecter.this.mode = IDEL_MODE;
+                PinDetecter.this.mode.set(IDEL_MODE);
                 if (pinDetectCallBack != null) {
                     pinDetectCallBack.onNetLoss();
                 }
@@ -150,7 +150,7 @@ public class PinDetecter {
     }
 
     public PinDetecter(Context context, @Mode int mode, PinDetectCallBack pinDetectCallBack) {
-        this.mode = mode;
+        this.mode.set(mode);
         this.pinDetectCallBack = pinDetectCallBack;
         networkSignalStrength = new NetworkSignalStrength(context);
         IntentFilter filter = new IntentFilter();
@@ -173,8 +173,7 @@ public class PinDetecter {
      * @param mode
      */
     public void changeEvent(@Mode int mode) {
-        Log.d(TAG, "应用模式切换：" + (mode==1?"活跃":"后台"));
-        int previouseMode = this.mode;
+        int previouseMode = this.mode.get();
         if(previouseMode == mode){
             return;
         }
@@ -200,8 +199,12 @@ public class PinDetecter {
             }
         }
         if (previouseMode != IDEL_MODE) {
-            this.mode = mode;
+            this.mode.set(mode);
         }
+    }
+
+    public void setMode(int mode){
+        this.mode.set(mode);
     }
 
     private boolean goodSignalInterval() {
@@ -220,7 +223,7 @@ public class PinDetecter {
      * @return
      */
     public RetrayParam getRetrayParam() {
-        return isHeartIntervalStable || mode == ACTIVE_MODE ? stableModeParam : tryModeParam;
+        return isHeartIntervalStable || mode.get() == ACTIVE_MODE ? stableModeParam : tryModeParam;
     }
 
 
@@ -243,7 +246,7 @@ public class PinDetecter {
      * 收到回复pin
      */
     public void pinReceivedProcess() {
-        switch (mode) {
+        switch (mode.get()) {
             case ACTIVE_MODE:
                 if (pinDetectCallBack != null) {
                     //前台时使用固定的心跳，保证及时收发消息
@@ -307,7 +310,7 @@ public class PinDetecter {
      */
     public synchronized void onSocketFailed() {
         //处于后台模式，当前间隔时间与固定间隔不相同，视为探测过程中
-        if (mode == BACKGORUND_MODE) {
+        if (mode.get() == BACKGORUND_MODE) {
             //一次失败即重置固定心跳间隔
             if (FIXED_HEART_INTERVAL != MIN_HEART_INTERVAL) {
                 FIXED_HEART_INTERVAL = MIN_HEART_INTERVAL;
@@ -361,13 +364,16 @@ public class PinDetecter {
                 mContext.unregisterReceiver(netState);
                 mContext = null;
             }catch (Exception e){
-//                Log.e(TAG,e.getMessage());
             }
         }
     }
 
     public boolean isActive(){
-        return mode == ACTIVE_MODE;
+        return mode.get() == ACTIVE_MODE;
+    }
+
+    public int getMode() {
+        return mode.get();
     }
 
     @IntDef({ACTIVE_MODE, BACKGORUND_MODE, IDEL_MODE})

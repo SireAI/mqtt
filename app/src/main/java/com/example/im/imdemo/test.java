@@ -1,7 +1,6 @@
 package com.example.im.imdemo;
 
-import com.jd.jrapp.bm.message.db.IMMessage;
-import com.jd.jrapp.bm.message.utils.TimeOffSetUtils;
+
 
 import java.io.File;
 import java.lang.reflect.Array;

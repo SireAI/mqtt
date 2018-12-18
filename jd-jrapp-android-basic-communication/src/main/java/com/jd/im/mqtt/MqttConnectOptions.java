@@ -54,15 +54,14 @@ public class MqttConnectOptions extends IMqttConnectOptions.Stub {
     protected static final int URI_TYPE_WSS = 4;
 
     private int keepAliveInterval = KEEP_ALIVE_INTERVAL_DEFAULT;
-    private String willDestination = null;
-    private IMQTTMessage willMessage = null;
+    private String willMessage = null;
     private String userName;
     private char[] password;
     private boolean cleanSession = CLEAN_SESSION_DEFAULT;
     private int connectionTimeout = CONNECTION_TIMEOUT_DEFAULT;
     private int messageSendTimeout = MESSAGE_SEND_TIMEOUT_DEFAULT;
     private String clientId ;
-    private String protocalName = MQTTVersion.VERSION_IM;
+    private String protocalName = MQTTVersion.VERSION_311;
     /**
      * 主机地址
      */
@@ -76,6 +75,10 @@ public class MqttConnectOptions extends IMqttConnectOptions.Stub {
      * 重连次数
      */
     private int reconnectCount = 3;
+    private int willQos = 2;
+    private boolean retain;
+    private boolean willFlag;
+    private String willTopic;
 
 
     public MqttConnectOptions() {
@@ -223,19 +226,56 @@ public class MqttConnectOptions extends IMqttConnectOptions.Stub {
         return clientId;
     }
 
+    @Override
+    public String getWillTopic() throws RemoteException {
+        return this.willTopic;
+    }
+    public MqttConnectOptions setWillTopic(String willTopic){
+        this.willTopic = willTopic;
+        return this;
+    }
+
+    @Override
+    public String getWillMessage() throws RemoteException {
+        return this.willMessage;
+    }
+
+    public MqttConnectOptions setWillMessage(String willMessage){
+        this.willMessage = willMessage;
+        return this;
+    }
+
     public MqttConnectOptions setClientId(String clientId) {
         this.clientId = clientId;
         return this;
     }
 
     @Override
-    public String getWillDestination() {
-        return willDestination;
+    public boolean isWillRetain() throws RemoteException {
+        return this.retain;
     }
 
     @Override
-    public IMQTTMessage getWillMessage() {
-        return willMessage;
+    public boolean willFlag() throws RemoteException {
+        return this.willFlag;
+    }
+    public MqttConnectOptions setWillFlag(boolean willFlag){
+        this.willFlag = willFlag;
+        return this;
+    }
+
+    public MqttConnectOptions setWillRetain(boolean retain){
+        this.retain = retain;
+        return this;
+    }
+
+    @Override
+    public int getWillQoS() throws RemoteException {
+        return this.willQos;
+    }
+    public MqttConnectOptions setWillQos(int qos){
+        this.willQos = qos;
+        return this;
     }
 
     @Override
@@ -273,15 +313,7 @@ public class MqttConnectOptions extends IMqttConnectOptions.Stub {
         return this;
     }
 
-    public MqttConnectOptions setWillDestination(String willDestination) {
-        this.willDestination = willDestination;
-        return this;
-    }
 
-    public MqttConnectOptions setWillMessage(IMQTTMessage willMessage) {
-        this.willMessage = willMessage;
-        return this;
-    }
 
 
 }

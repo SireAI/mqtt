@@ -1,6 +1,7 @@
 package com.sire.micro.databuffer.cache;
 
 import android.content.Context;
+import android.os.Process;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
@@ -248,7 +249,10 @@ public class DiskCache implements IReceiver {
         @Override
         public synchronized Thread newThread(Runnable runnable) {
             Thread result = new Thread(runnable, "data-buffer-cache-thread");
-            result.setPriority(Thread.MIN_PRIORITY);
+            result.setPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            if(result.isDaemon()){
+                result.setDaemon(false);
+            }
             return result;
         }
     }

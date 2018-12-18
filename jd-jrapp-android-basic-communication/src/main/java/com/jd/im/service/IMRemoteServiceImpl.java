@@ -32,10 +32,10 @@ import com.jd.im.utils.Log;
     }
 
     @Override
-    public int publish(String topic,byte[] payload,  byte qos) throws RemoteException {
+    public int publish(String topic,byte[] payload,  byte qos,boolean retain) throws RemoteException {
         int identifier = -1;
         if(mqttService!=null){
-            identifier = mqttService.publish(topic,payload,qos);
+            identifier = mqttService.publishRetain(topic,payload,qos,retain);
         }
         return identifier;
     }

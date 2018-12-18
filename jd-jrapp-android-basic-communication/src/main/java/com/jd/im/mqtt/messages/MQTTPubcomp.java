@@ -58,7 +58,8 @@ public class MQTTPubcomp extends MQTTMessage  {
       System.arraycopy(buffer, i + variableHeader.length, payload, 0, remainingLength - variableHeader.length);
 
     // Get package identifier
-    packageIdentifier = new BigInteger(1, variableHeader).intValue();
+    packageIdentifier = (variableHeader[variableHeader.length - 2] >> 8 & 0xFF) | (variableHeader[variableHeader.length - 1] & 0xFF);
+
   }
 
   @Override

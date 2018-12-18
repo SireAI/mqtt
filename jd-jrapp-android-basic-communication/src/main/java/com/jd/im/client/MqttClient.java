@@ -207,13 +207,11 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
             if (imRemoteService == null) {
                 Log.d(TAG, "try to bind remote  remoteService");
                 Intent intent = new Intent(app, MqttService.class);
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    app.startForegroundService(intent);
-//                } else {
-//                    app.startService(intent);
-//                }
-                app.startService(intent);
-
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    app.startForegroundService(intent);
+                } else {
+                    app.startService(intent);
+                }
                 if (!app.bindService(intent, this, Service.BIND_AUTO_CREATE)) {
                     Log.e(TAG, "remote  remoteService bind failed");
                 }
@@ -288,19 +286,21 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
         } else {
             Log.e(TAG, "服务未连接");
         }
-        try {
-            if(isBind){
-                if(imRemoteService!=null){
-                    imRemoteService.unBindLocalService();
+        if(!tryReconnect){
+            try {
+                if(isBind){
+                    if(imRemoteService!=null){
+                        imRemoteService.unBindLocalService();
+                    }
+                    this.app.unbindService(this);
+                    isBind = false;
                 }
-                this.app.unbindService(this);
-                isBind = false;
+                Intent intent = new Intent(app, MqttService.class);
+                this.app.stopService(intent);
+                imRemoteService = null;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            Intent intent = new Intent(app, MqttService.class);
-            this.app.stopService(intent);
-            imRemoteService = null;
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -393,10 +393,17 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
 
 
     private void publish(String topic, byte[] payload, byte qos,  MessageCallBack messageCallBack) {
+        publish(topic,payload,qos,false,messageCallBack);
+    }
+    private void publish(String topic, byte[] payload, byte qos,boolean retain,  MessageCallBack messageCallBack) {
         if (isConnected()) {
             try {
-                int identifier = imRemoteService.publish(topic, payload, qos);
-                saveCallBack(identifier, messageCallBack);
+                int identifier = imRemoteService.publish(topic, payload, qos,retain);
+                if(identifier<0 && messageCallBack!=null){
+                    messageCallBack.onFailed(new MQTTConnectException("identifier is "+identifier));
+                }else {
+                    saveCallBack(identifier, messageCallBack);
+                }
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -406,6 +413,7 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
             }
         }
     }
+
 
     /**
      * 发布消息

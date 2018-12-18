@@ -46,7 +46,7 @@ android {
 }
 
 dependencies {
-    provided 'com.android.support:appcompat-v7:27.1.1'
+    compileOnly 'com.android.support:appcompat-v7:27.1.1'
 }
 
 apply from: '../publish.gradle'

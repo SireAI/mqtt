@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 
-public  class MQTTMessage extends IMQTTMessage.Stub {
+public  class
+MQTTMessage extends IMQTTMessage.Stub {
 
     protected byte flags;
 
@@ -39,7 +40,7 @@ public  class MQTTMessage extends IMQTTMessage.Stub {
     /**
      * @return The packageIdentifier
      */
-//  @Override
+  @Override
     public int getPackageIdentifier() {
         return packageIdentifier;
     }
@@ -108,6 +109,7 @@ public  class MQTTMessage extends IMQTTMessage.Stub {
     /**
      * @param type The type to set
      */
+    @Override
     public void setType(byte type) {
         this.type = type;
     }

@@ -9,6 +9,8 @@ import android.support.annotation.RestrictTo;
 import java.util.List;
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 public class Utils {
+
+
     /**
      * 判断应用是否在后台
      *
@@ -17,31 +19,15 @@ public class Utils {
      */
     public static boolean isAppIsInBackground(Context context) {
         boolean isInBackground = true;
-        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT_WATCH) {
-            List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
-            if(runningProcesses!=null){
-                for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
-                    //前台程序
-                    if (processInfo.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND && processInfo.pkgList!=null) {
-                        for (String activeProcess : processInfo.pkgList) {
-                            if (activeProcess.equals(context.getPackageName())) {
-                                isInBackground = false;
-                            }
-                        }
-                    }
+        ActivityManager  am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> runningProcesses = am.getRunningAppProcesses();
+        if(runningProcesses!=null){
+            for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
+                if (processInfo.processName.equals(context.getPackageName())) {
+                    isInBackground = processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+                    break ;
                 }
             }
-
-        } else {
-            List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-            if(taskInfo!=null){
-                ComponentName componentInfo = taskInfo.get(0).topActivity;
-                if (componentInfo!= null && componentInfo.getPackageName().equals(context.getPackageName())) {
-                    isInBackground = false;
-                }
-            }
-
         }
         return isInBackground;
     }

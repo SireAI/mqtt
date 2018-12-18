@@ -10,7 +10,7 @@ interface IMRemoteService {
          * 发布
          * @param message
          */
-        int publish(String topic,in byte[] payload,  byte qos);
+        int publish(String topic,in byte[] payload,  byte qos, boolean retain);
 
 
         /**
