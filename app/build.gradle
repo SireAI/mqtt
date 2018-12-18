@@ -36,15 +36,14 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
     //        implementation 'com.android.support:appcompat-v7:23.2.1'
     //    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     //    implementation 'com.jd.jrapp.library:network:1.4.9-20180608-SNAPSHOT'
-    implementation('com.android.support:design:27.1.1') {
+    compile('com.android.support:design:27.1.1') {
         exclude group: 'android.arch.lifecycle'
     }
     //    compile project(':jd-jrapp-android-protobuffer-converter')
-    implementation project(':jd-jrapp-android-basic-communication')
+    compile project(':jd-jrapp-android-basic-communication')
     //        implementation 'com.sire:protobuffer-converter:1.0.1'
     //        implementation 'com.sire:jd-im:1.0.1'
 //    compile project(':jd-jrapp-bm-message')
@@ -53,5 +52,5 @@ dependencies {
     //    compile 'com.jingdong.wireless.libs:jd_shooter:1.0.5'
 //    mplementation 'com.alibaba:arouter-api:1.3.1'
 //    annotationProcessor 'com.alibaba:arouter-compiler:1.1.4' i
-    implementation project(':databuffer')
+    compile project(':databuffer')
 }

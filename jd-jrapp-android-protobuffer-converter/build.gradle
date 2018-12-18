@@ -51,9 +51,9 @@ protobuf {
 
 
 dependencies {
-    implementation 'com.google.protobuf.nano:protobuf-javanano:3.2.0rc2'
+    compile 'com.google.protobuf.nano:protobuf-javanano:3.2.0rc2'
 
-    implementation project(':jd-jrapp-android-basic-communication')
+    compile project(':jd-jrapp-android-basic-communication')
 //    implementation 'com.sire:jd-im:1.0.1'
 }
 
