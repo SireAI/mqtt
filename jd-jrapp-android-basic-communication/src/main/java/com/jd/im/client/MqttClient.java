@@ -207,11 +207,12 @@ public class MqttClient extends ConnectStateCallBack.Stub implements ServiceConn
             if (imRemoteService == null) {
                 Log.d(TAG, "try to bind remote  remoteService");
                 Intent intent = new Intent(app, MqttService.class);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    app.startForegroundService(intent);
-                } else {
-                    app.startService(intent);
-                }
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    app.startForegroundService(intent);
+//                } else {
+//                    app.startService(intent);
+//                }
+                app.startService(intent);
                 if (!app.bindService(intent, this, Service.BIND_AUTO_CREATE)) {
                     Log.e(TAG, "remote  remoteService bind failed");
                 }

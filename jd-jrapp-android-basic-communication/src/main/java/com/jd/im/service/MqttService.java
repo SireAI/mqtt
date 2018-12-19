@@ -196,9 +196,9 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     @Override
     public void onDestroy() {
         Log.w(TAG, "服务销毁");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            stopForeground(true);
-        }
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            stopForeground(true);
+//        }
         disconnect(true);
         pinSender.release();
         cancelDataWorker();
@@ -849,21 +849,21 @@ public class MqttService extends Service implements SocketCallBack, Handler.Call
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            final NotificationChannel notificationChannel = notificationManager.getNotificationChannel(CHANNEL_ID);
-            if(notificationChannel==null){
-                NotificationChannel  channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
-                channel.setDescription("");
-                channel.setSound(null, null);
-                channel.setShowBadge(false);
-                channel.setBypassDnd(false);
-                channel.enableLights(false);
-                channel.enableVibration(false);
-                notificationManager.createNotificationChannel(channel);
-            }
-            Notification notification = new Notification.Builder(this, CHANNEL_ID).setOngoing(false).setAutoCancel(true).build();
-            startForeground(NOTIFICATION_ID, notification);
-        }
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//            final NotificationChannel notificationChannel = notificationManager.getNotificationChannel(CHANNEL_ID);
+//            if(notificationChannel==null){
+//                NotificationChannel  channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_NONE);
+//                channel.setDescription("");
+//                channel.setSound(null, null);
+//                channel.setShowBadge(false);
+//                channel.setBypassDnd(false);
+//                channel.enableLights(false);
+//                channel.enableVibration(false);
+//                notificationManager.createNotificationChannel(channel);
+//            }
+//            Notification notification = new Notification.Builder(this, CHANNEL_ID).setOngoing(false).setAutoCancel(true).build();
+//            startForeground(NOTIFICATION_ID, notification);
+//        }
         return START_REDELIVER_INTENT;
     }
 
