@@ -1,1 +1,5 @@
 /build
+/sign.properties
+/keystore
+*.apk
+/router-mapping/
